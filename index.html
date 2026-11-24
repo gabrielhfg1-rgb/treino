@@ -493,6 +493,11 @@ h1,h2,h3{font-weight:700;letter-spacing:.02em}
 .pl-box.vert .pl-frame{aspect-ratio:9/16}
 .pl-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .pl-ext{align-self:center;font-size:.85rem}
+.pl-actions{display:flex;align-items:center;gap:8px;flex:none}
+.pl-mute{display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 12px 0 10px;border-radius:99px;border:1px solid rgba(34,211,238,.45);background:rgba(34,211,238,.12);color:#bff6ff;font:inherit;font-family:var(--display);font-weight:700;font-size:.8rem;letter-spacing:.04em;box-shadow:0 0 14px rgba(34,211,238,.25)}
+.pl-mute svg{width:18px;height:18px}
+.pl-mute.off{border-color:rgba(255,92,138,.5);background:rgba(255,92,138,.12);color:#ffc2d3;box-shadow:0 0 14px rgba(255,92,138,.25)}
+.pl-note{margin:0;text-align:center;font-size:.78rem;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){.player{animation:none}}
 /* ajustes para a fonte técnica, que é mais larga */
 .hero h1{font-size:clamp(2.1rem,10vw,3rem);line-height:.95;overflow-wrap:normal}
@@ -562,6 +567,8 @@ const icon = {
   list:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="3.5" width="16" height="17" rx="3"/><path d="M8 8.5h8M8 12h8M8 15.5h5"/></svg>',
   user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c1.2-3.6 4-5.5 7-5.5s5.8 1.9 7 5.5"/></svg>',
   google:'<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.3zM12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22zM6.4 14a6 6 0 0 1 0-3.9V7.5H3.1a10 10 0 0 0 0 9.1L6.4 14zM12 6c1.5 0 2.8.5 3.8 1.5l2.9-2.9A10 10 0 0 0 3.1 7.5L6.4 10C7.2 7.7 9.4 6 12 6z"/></svg>',
+  sound:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor" stroke="none"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>',
+  muted:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor" stroke="none"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg>',
   trash:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>'
 };
 
@@ -743,15 +750,36 @@ function embedOf(url){
   if (m) return {src:'https://www.tiktok.com/embed/v2/' + m[1], kind:'TikTok', vertical:true};
   return null;
 }
+function isMuted(){ try { return localStorage.getItem('treino:mute') === '1'; } catch(e){ return false; } }
+function setMuted(v){ try { localStorage.setItem('treino:mute', v ? '1' : '0'); } catch(e){} }
+function muteBtn(){
+  const m = isMuted();
+  return `<button class="pl-mute${m ? ' off' : ''}" data-act="mute" aria-pressed="${m}" aria-label="${m ? 'Ligar o som dos vídeos' : 'Desligar o som dos vídeos'}">${m ? icon.muted : icon.sound}<span>${m ? 'Sem som' : 'Com som'}</span></button>`;
+}
+function toggleMute(){
+  const m = !isMuted(); setMuted(m);
+  const f = document.querySelector('#player iframe');
+  if (f && f.contentWindow){
+    try {
+      f.contentWindow.postMessage(JSON.stringify({event:'command', func: m ? 'mute' : 'unMute', args:[]}), '*');
+      if (!m) f.contentWindow.postMessage(JSON.stringify({event:'command', func:'setVolume', args:[100]}), '*');
+    } catch(e){}
+  }
+  const b = document.querySelector('#player .pl-mute'); if (b) b.outerHTML = muteBtn();
+  if (!$('#sheet').hidden && $('#sheet').querySelector('[data-act=mute-set]')) renderAccount();
+  toast(m ? 'Som desligado em todos os vídeos' : 'Som ligado nos vídeos');
+}
 function openPlayer(url, label){
   const e = embedOf(url);
   if (!e) return false;
   const vertical = e.vertical || /shorts\//i.test(url) || /skeletmotion/i.test(label || '');
+  const src = e.kind === 'YouTube' ? e.src + '&enablejsapi=1&mute=' + (isMuted() ? 1 : 0) + '&origin=' + encodeURIComponent(location.origin) : e.src;
   const el = $('#player');
   el.innerHTML = `<div class="pl-box${vertical ? ' vert' : ''}" role="dialog" aria-modal="true" aria-label="${esc(label || 'Vídeo')}">
     <div class="pl-top"><span class="pl-title"><span class="eyebrow">Vídeo · ${esc(e.kind)}</span><b>${esc(label || '')}</b></span>
-      <button class="x" data-act="closeplayer" aria-label="Fechar vídeo">${icon.x}</button></div>
-    <div class="pl-frame"><iframe src="${esc(e.src)}" title="${esc(label || 'Vídeo do exercício')}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+      <span class="pl-actions">${e.kind === 'YouTube' ? muteBtn() : ''}<button class="x" data-act="closeplayer" aria-label="Fechar vídeo">${icon.x}</button></span></div>
+    <div class="pl-frame"><iframe src="${esc(src)}" title="${esc(label || 'Vídeo do exercício')}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+    ${e.kind !== 'YouTube' ? '<p class="pl-note">O som deste vídeo é controlado no próprio player.</p>' : ''}
     <a class="btn ghost pl-ext" href="${esc(url)}" target="_blank" rel="noopener">Não carregou? Abrir no ${esc(e.kind)} ↗</a>
   </div>`;
   el.hidden = false;
@@ -1602,6 +1630,7 @@ function renderAccount(){
       <button class="vid-alt" data-act="export" style="border:0;text-align:left;width:100%"><span class="pb">${icon.down}</span><span><b>Baixar backup</b><small>Salva um arquivo com plano, treinos e medidas</small></span></button>
       <label class="vid-alt" for="imp-file" style="cursor:pointer"><span class="pb">${icon.up}</span><span><b>Restaurar backup</b><small>Carrega um arquivo de backup (substitui os dados atuais)</small></span></label>
       <input type="file" id="imp-file" accept=".json,application/json" hidden>
+      <button class="vid-alt" data-act="mute-set" style="border:0;text-align:left;width:100%"><span class="pb">${isMuted() ? icon.muted : icon.sound}</span><span><b>Som dos vídeos: ${isMuted() ? 'desligado' : 'ligado'}</b><small>${isMuted() ? 'Toque para ligar o som em todos os vídeos' : 'Toque para tocar todos os vídeos sem som'}</small></span></button>
       ${isStandalone() ? '' : `<button class="vid-alt" data-act="install" style="border:0;text-align:left;width:100%"><span class="pb">${icon.down}</span><span><b>Instalar o app</b><small>Ícone na tela inicial, abre como aplicativo</small></span></button>`}
     </div>
     ${account ? '<button class="btn danger" data-act="logout">Sair da conta</button>' : ''}
@@ -1650,6 +1679,7 @@ document.addEventListener('click', ev => {
   }
   if (a === 'play'){ if (openPlayer(b.dataset.url, b.dataset.label)) ev.preventDefault(); return; }
   if (a === 'closeplayer'){ closePlayer(); return; }
+  if (a === 'mute' || a === 'mute-set'){ toggleMute(); return; }
   if (a === 'login'){ doLogin(); return; }
   if (a === 'lgmode'){ loginMode = b.dataset.m; loginErr = ''; if (loginMode !== 'reset') loginMsg = ''; render(); const f = $('#lg-' + (loginMode === 'up' ? 'name' : 'email')); if (f) f.focus(); return; }
   if (a === 'install'){ doInstall(); return; }
