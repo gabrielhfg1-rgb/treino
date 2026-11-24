@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#15171c">
+<meta name="theme-color" content="#05060d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -18,7 +18,7 @@
 <title>Treino do Dia</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
 <style>
 /* Layout: app de uma coluna. Cartão "ferro" escuro com a anilha de progresso abre a tela; cada treino veste a cor de uma anilha olímpica (vermelho 25, azul 20, amarelo 15, verde 10, branco 5); navegação fixa embaixo */
 :root{
@@ -332,6 +332,163 @@ h2{font-size:1.6rem}
 .tb-right{display:flex;align-items:center;gap:10px}
 .acct{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;color:var(--fg);padding:0}
 .acct svg{width:18px;height:18px}
+/* ===== Tema futurista =====
+   Fundo espacial com grade e brilhos, painéis de vidro, neon ciano → violeta → rosa,
+   fonte técnica nos títulos. Visual escuro fixo (escolha de design). */
+:root:root:root{
+  --bg:#05060d; --surface:rgba(18,22,44,.62); --surface-2:rgba(255,255,255,.055); --fg:#e9edff; --muted:#8e97bd;
+  --line:rgba(130,150,255,.16);
+  --accent:#22d3ee; --accent-fg:#02121a; --accent-soft:rgba(34,211,238,.14);
+  --violet:#8b5cf6; --pink:#ec4899;
+  --grad:linear-gradient(120deg,#22d3ee 0%,#8b5cf6 55%,#ec4899 100%);
+  --done:#34f5a4; --done-soft:rgba(52,245,164,.10); --danger:#ff5c8a;
+  --iron:rgba(10,12,30,.72); --iron-2:rgba(255,255,255,.06); --iron-fg:#eef1ff; --iron-muted:#9aa3c7; --iron-line:rgba(130,150,255,.2);
+  --scrim:rgba(2,3,10,.72);
+  --shadow:0 0 0 1px rgba(130,150,255,.10),0 24px 60px -28px rgba(0,0,0,.9);
+  --glow:0 0 22px rgba(34,211,238,.35);
+  --display:"Chakra Petch","Arial Narrow",system-ui,sans-serif;
+  --r:20px;
+  color-scheme:dark;
+}
+body{
+  background:
+    radial-gradient(900px 520px at 8% -8%, rgba(139,92,246,.30), transparent 62%),
+    radial-gradient(760px 480px at 105% 6%, rgba(34,211,238,.20), transparent 60%),
+    radial-gradient(700px 600px at 50% 120%, rgba(236,72,153,.16), transparent 60%),
+    #05060d;
+  background-attachment:fixed;
+}
+body::after{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background-image:linear-gradient(rgba(120,140,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(120,140,255,.07) 1px,transparent 1px);
+  background-size:44px 44px;
+  -webkit-mask-image:radial-gradient(ellipse at 50% 0%,#000 0%,transparent 75%); mask-image:radial-gradient(ellipse at 50% 0%,#000 0%,transparent 75%);
+}
+.wrap{position:relative;z-index:1}
+h1,h2,h3{font-weight:700;letter-spacing:.02em}
+.eyebrow{color:#7fe6f7;letter-spacing:.2em}
+.eyebrow::before{content:"// ";opacity:.55}
+.lbl{color:#9fb0e8;letter-spacing:.16em}
+
+/* vidro */
+.hero,.card,.ex,.week,.chip,.tile,.empty,.rest,.sched,.ed-day,.tpl,.install,.lg-card,.nav,.sheet,.toast,.timer,.video,.vid-alt,.stat,.kv div,.prof div,.tpl-prev{
+  -webkit-backdrop-filter:blur(18px) saturate(140%); backdrop-filter:blur(18px) saturate(140%);
+}
+.card,.ex,.week,.chip,.tile,.empty,.rest,.sched,.ed-day,.tpl,.install{background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow)}
+
+/* topo */
+.topbar .brand{font-family:var(--display);letter-spacing:.14em}
+.topbar .brand i{background:var(--grad);box-shadow:inset 0 0 0 5px transparent,0 0 14px rgba(34,211,238,.7);border-radius:50%;position:relative}
+.topbar .brand i::after{content:"";position:absolute;inset:6px;border-radius:50%;background:var(--bg)}
+.acct{background:var(--surface);border-color:var(--line);box-shadow:var(--glow)}
+
+/* cartão principal */
+.hero{background:linear-gradient(160deg,rgba(32,38,78,.82),rgba(8,10,26,.86));border:1px solid rgba(34,211,238,.22);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 30px 70px -34px rgba(34,211,238,.45),0 0 0 1px rgba(139,92,246,.12)}
+.hero::before{background:
+  repeating-linear-gradient(0deg,transparent 0 3px,rgba(255,255,255,.018) 3px 4px),
+  radial-gradient(400px 200px at 100% 0%,color-mix(in srgb,var(--pc,#22d3ee) 30%,transparent),transparent 70%)}
+.hero::after{width:3px;background:var(--pc,var(--accent));box-shadow:0 0 18px var(--pc,var(--accent)),0 0 4px var(--pc,var(--accent))}
+.hero h1{background:linear-gradient(180deg,#ffffff 30%,#a9c6ff);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none}
+.hero-meta span{background:rgba(255,255,255,.06);border:1px solid var(--iron-line);font-family:var(--display);letter-spacing:.04em}
+.plate svg{filter:drop-shadow(0 0 14px color-mix(in srgb,var(--pc) 70%,transparent))}
+.big b{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* semana */
+.wk .badge{box-shadow:0 0 12px color-mix(in srgb,var(--pc) 60%,transparent);font-family:var(--display)}
+.wk.off .badge{border-color:var(--line)}
+.wk[aria-pressed="true"]{background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 1px var(--line)}
+.wk.today small,.wk.today span{color:#7fe6f7}
+
+/* exercícios */
+.ex{transition:transform .15s,box-shadow .2s,background .2s}
+.ex:active{transform:scale(.99)}
+.ex-num{color:transparent;-webkit-text-stroke:1px rgba(130,150,255,.45);font-family:var(--display)}
+.check{border-left-color:var(--line)}
+.check i{border-color:rgba(130,150,255,.35)}
+.ex.done{background:linear-gradient(90deg,rgba(52,245,164,.12),rgba(52,245,164,.04));border-color:rgba(52,245,164,.35)}
+.ex.done .ex-num{-webkit-text-stroke:1px var(--done);opacity:.7}
+.ex.done .check i{box-shadow:0 0 14px rgba(52,245,164,.6)}
+.dots i{background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px var(--line)}
+.dots i.on{background:var(--done);box-shadow:0 0 8px rgba(52,245,164,.7)}
+
+/* botões */
+.btn{background:var(--surface);border-color:var(--line);font-family:var(--display);letter-spacing:.04em}
+.btn.primary{background:var(--grad);border:0;color:#fff;box-shadow:0 8px 26px -8px rgba(139,92,246,.7),0 0 0 1px rgba(255,255,255,.08) inset;text-shadow:0 1px 0 rgba(0,0,0,.25)}
+.btn.primary:disabled{opacity:.6}
+.btn.dark{background:#e9edff;color:#05060d}
+.btn.ghost{color:#7fe6f7;background:none}
+.chip[aria-pressed="true"],.card .chip[aria-pressed="true"]{background:var(--grad);color:#fff;border-color:transparent;box-shadow:var(--glow)}
+.pill{background:rgba(34,211,238,.12);color:#9befff;border:1px solid rgba(34,211,238,.3)}
+.note{background:rgba(139,92,246,.14);border:1px solid rgba(139,92,246,.3)}
+
+/* navegação */
+.nav{background:rgba(6,8,20,.72);border-top:1px solid var(--line)}
+.nav button[aria-current="page"]{color:#fff}
+.nav button[aria-current="page"] svg{color:#22d3ee;filter:drop-shadow(0 0 6px rgba(34,211,238,.9))}
+.nav button{font-family:var(--display);letter-spacing:.06em}
+
+/* folha do exercício */
+.sheet{background:linear-gradient(180deg,rgba(20,24,52,.96),rgba(6,8,22,.98));border-top:2px solid var(--pc,var(--accent));box-shadow:0 -20px 60px -20px color-mix(in srgb,var(--pc,#22d3ee) 45%,transparent)}
+.x{background:rgba(255,255,255,.07);color:var(--fg)}
+.stat{background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.stat b,.stat input{font-family:var(--display)}
+.set{border-color:rgba(130,150,255,.35);font-family:var(--display)}
+.set.on{box-shadow:0 0 16px rgba(52,245,164,.6);color:#04140c}
+.timer{background:rgba(5,7,18,.8);border:1px solid var(--line)}
+.clock{font-family:var(--display)}
+.timer.running .clock{color:#22d3ee;text-shadow:0 0 18px rgba(34,211,238,.7)}
+.video{background:linear-gradient(120deg,rgba(34,211,238,.14),rgba(139,92,246,.18));border:1px solid rgba(34,211,238,.28)}
+.video::after{border-color:var(--pc,var(--accent));opacity:.35;filter:blur(1px)}
+.video .pb,.vid-alt .pb{box-shadow:0 0 16px color-mix(in srgb,var(--pc,#22d3ee) 70%,transparent)}
+.vid-alt,.vid-save{background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.field input,.field textarea,.field select,.wk-row select,.vid-ed input,.vid-row input{background:rgba(5,7,18,.6);border-color:var(--line);color:var(--fg)}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:#22d3ee;box-shadow:0 0 0 3px rgba(34,211,238,.2)}
+.savebar{background:rgba(5,6,13,.86);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.toast{background:rgba(233,237,255,.95);color:#05060d;box-shadow:var(--glow)}
+.motto{background:var(--grad);color:#fff}
+.tile b{font-family:var(--display)}
+.install{border-color:rgba(34,211,238,.3)}
+.hm.l4{box-shadow:0 0 8px rgba(34,211,238,.7)}
+
+/* ===== tela de login ===== */
+.lg{min-height:calc(100vh - 40px);display:flex;flex-direction:column;justify-content:center;gap:18px;padding-block:20px}
+.lg-brand{display:flex;align-items:center;gap:16px}
+.lg-brand img{border-radius:22px;box-shadow:0 0 40px rgba(34,211,238,.45),0 0 0 1px rgba(255,255,255,.1);animation:pulse 4s ease-in-out infinite}
+.lg-brand h1{font-size:2.6rem;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:.95}
+@keyframes pulse{0%,100%{box-shadow:0 0 30px rgba(34,211,238,.35),0 0 0 1px rgba(255,255,255,.1)}50%{box-shadow:0 0 50px rgba(139,92,246,.55),0 0 0 1px rgba(255,255,255,.15)}}
+@media (prefers-reduced-motion:reduce){.lg-brand img{animation:none}}
+.lg-card{position:relative;padding:22px;border-radius:24px;background:linear-gradient(160deg,rgba(28,34,72,.78),rgba(8,10,26,.86));border:1px solid rgba(34,211,238,.22);
+  box-shadow:0 30px 80px -30px rgba(139,92,246,.55),inset 0 1px 0 rgba(255,255,255,.08);display:flex;flex-direction:column;gap:16px;overflow:hidden}
+.lg-card::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:var(--grad);box-shadow:0 0 16px rgba(34,211,238,.8)}
+.lg-card h2{font-size:1.6rem}
+.lg-tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border-radius:14px;background:rgba(5,7,18,.6);border:1px solid var(--line)}
+.lg-tabs button{border:0;background:none;color:var(--muted);padding:10px;border-radius:10px;font-family:var(--display);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:.85rem}
+.lg-tabs button[aria-selected="true"]{background:var(--grad);color:#fff;box-shadow:0 0 18px rgba(139,92,246,.5)}
+.lg-form{display:flex;flex-direction:column;gap:12px}
+.lg-field{display:flex;flex-direction:column;gap:6px}
+.lg-field span{font-size:.7rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#9fb0e8}
+.lg-field input{width:100%;border:1px solid var(--line);background:rgba(5,7,18,.65);color:var(--fg);border-radius:12px;padding:13px 14px;font-size:1rem;transition:border-color .15s,box-shadow .15s}
+.lg-field input:focus{outline:none;border-color:#22d3ee;box-shadow:0 0 0 3px rgba(34,211,238,.18),0 0 18px rgba(34,211,238,.25)}
+.lg-field input::placeholder{color:#5d6690}
+.lg-msg{margin:0;padding:10px 12px;border-radius:12px;font-size:.88rem;line-height:1.4}
+.lg-msg.err{background:rgba(255,92,138,.12);border:1px solid rgba(255,92,138,.4);color:#ffc2d3}
+.lg-msg.ok{background:rgba(52,245,164,.1);border:1px solid rgba(52,245,164,.4);color:#b9ffe0}
+.lg-or{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:.78rem;letter-spacing:.2em;text-transform:uppercase}
+.lg-or::before,.lg-or::after{content:"";flex:1;height:1px;background:var(--line)}
+.lg-google{background:#fff;color:#1f2330;border:0}
+.lg-google svg{color:#1f2330}
+.lg-foot{margin:0;text-align:center;color:var(--muted);font-size:.8rem}
+/* ajustes para a fonte técnica, que é mais larga */
+.hero h1{font-size:clamp(2.1rem,10vw,3rem);line-height:.95;overflow-wrap:normal}
+.big b{font-size:clamp(3.4rem,17vw,4.6rem)}
+.topbar{align-items:center}
+.topbar .brand{letter-spacing:.08em;font-size:.95rem;white-space:nowrap}
+.topbar .eyebrow{white-space:nowrap;letter-spacing:.14em}
+.topbar .eyebrow::before{content:none}
+.sheet-top h2{font-size:1.8rem}
+.plate .ring{stroke:#ffffff}
+.ex-num{font-size:2rem}
 </style>
 </head>
 <body>
@@ -444,7 +601,7 @@ async function init(){
   if (cloud && cloud.configured){
     const user = await cloud.user();
     if (!user){ view = 'login'; render(); return; }
-    account = {name:user.displayName || '', email:user.email || ''};
+    account = {name:user.displayName || (user.email || '').split('@')[0], email:user.email || ''};
     d = cloud.db;
   } else noCloud = true;
   if (!d){ mode = 'local'; loaded = true; render(); return; }
@@ -558,7 +715,7 @@ function videoBlock(ex){
 function toast(msg){ const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 3200); }
 
 /* ---------- tela de hoje ---------- */
-const PLATES = [['#d6301f','#ffffff'],['#1f5fd1','#ffffff'],['#e8b010','#15171c'],['#178a4a','#ffffff'],['#e9eaee','#15171c'],['#6d4fd8','#ffffff'],['#3a3e47','#ffffff']];
+const PLATES = [['#22d3ee','#02121a'],['#a78bfa','#0b0620'],['#f472b6','#1a0410'],['#34f5a4','#03140c'],['#fbbf24','#1a1002'],['#60a5fa','#020c1a'],['#fb7185','#1a0408']];
 function pcOf(d, p){ p = p || plan; const i = p && d ? p.days.indexOf(d) : 0; const c = PLATES[(i < 0 ? 0 : i) % PLATES.length]; return `--pc:${c[0]};--pf:${c[1]}`; }
 function badgeOf(d){ if (d.badge) return String(d.badge).slice(0,2).toUpperCase(); const l = (d.label || '').trim(), parts = l.split(/\s+/), last = parts[parts.length-1] || ''; return (parts.length > 1 && last.length <= 2 ? last : l.slice(0,1)).toUpperCase(); }
 function dayOfEx(id){ return (plan?.days || []).find(d => d.exercises.some(e => e.id === id)); }
@@ -572,7 +729,7 @@ function plateSVG(done, n){
     ${f > 0 ? `<circle class="ring" cx="60" cy="60" r="${r}" fill="none" stroke="var(--pf)" stroke-width="9" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C*(1-f)).toFixed(1)}" transform="rotate(-90 60 60)"/>` : ''}
     <circle cx="60" cy="60" r="28" fill="var(--iron)"/>
     <circle cx="60" cy="60" r="28" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="3"/>
-    <text x="60" y="61" text-anchor="middle" dominant-baseline="middle" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" font-size="22" fill="var(--iron-fg)">${done}/${n}</text></svg>`;
+    <text x="60" y="61" text-anchor="middle" dominant-baseline="middle" font-family="Chakra Petch, Arial Narrow, sans-serif" font-weight="900" font-size="22" fill="var(--iron-fg)">${done}/${n}</text></svg>`;
 }
 function renderNav(){
   const nav = $('#nav'), show = view === 'today' || view === 'body' || view === 'prog';
@@ -1310,26 +1467,76 @@ function renderInstallHelp(){
 
 /* ---------- conta, login e backup ---------- */
 let account = null, noCloud = false, cloudRef = null;
+let loginMode = 'in', loginErr = '', loginMsg = '', loginBusy = false;
+const lg = {name:'', email:'', pass:'', pass2:''};
 function renderLogin(){
-  $('#app').innerHTML = `${topbar(true)}
-    <section class="hero" style="--pc:var(--accent)"><span class="eyebrow">Bem-vindo</span><h1>Entre para treinar</h1>
-      <p class="focus" style="margin:0">Entre com sua conta Google. Seus treinos, cargas e medidas ficam salvos nela e aparecem iguais no celular e no computador.</p>
-      <div class="row"><button class="btn primary" data-act="login">${icon.google} Entrar com Google</button></div>
-      ${loginErr ? `<p class="note" style="color:var(--fg)">${esc(loginErr)}</p>` : ''}
-    </section>
-    <div class="foot"><small>Só você tem acesso aos seus dados.</small></div>`;
+  const up = loginMode === 'up', reset = loginMode === 'reset';
+  const field = (id, label, type, key, extra) => `<label class="lg-field"><span>${label}</span><input id="lg-${key}" data-lg="${key}" type="${type}" value="${esc(lg[key])}" ${extra || ''}></label>`;
+  $('#app').innerHTML = `
+    <div class="lg">
+      <div class="lg-brand"><img src="icons/icon-192.png" alt="" width="84" height="84"><div><span class="eyebrow">Sistema de treino</span><h1>Treino do Dia</h1></div></div>
+      <section class="lg-card">
+        ${reset ? `<button class="btn ghost" data-act="lgmode" data-m="in" style="align-self:flex-start;padding-left:0">‹ Voltar para entrar</button>
+          <h2>Redefinir senha</h2><p class="muted" style="margin:0">Digite o e-mail da sua conta. Vamos mandar um link para você criar uma senha nova.</p>`
+        : `<div class="lg-tabs" role="tablist">
+            <button role="tab" data-act="lgmode" data-m="in" aria-selected="${!up}">Entrar</button>
+            <button role="tab" data-act="lgmode" data-m="up" aria-selected="${up}">Criar conta</button>
+          </div>`}
+        <form id="login-form" class="lg-form" novalidate>
+          ${up ? field('name', 'Seu nome', 'text', 'name', 'autocomplete="name" placeholder="Como quer ser chamado"') : ''}
+          ${field('email', 'E-mail', 'email', 'email', 'autocomplete="email" inputmode="email" placeholder="voce@email.com" required')}
+          ${reset ? '' : field('pass', 'Senha', 'password', 'pass', `autocomplete="${up ? 'new-password' : 'current-password'}" placeholder="${up ? 'Mínimo de 6 caracteres' : 'Sua senha'}" required`)}
+          ${up ? field('pass2', 'Repita a senha', 'password', 'pass2', 'autocomplete="new-password" required') : ''}
+          ${loginErr ? `<p class="lg-msg err" role="alert">${esc(loginErr)}</p>` : ''}
+          ${loginMsg ? `<p class="lg-msg ok" role="status">${esc(loginMsg)}</p>` : ''}
+          <button class="btn primary wide" type="submit" ${loginBusy ? 'disabled' : ''}>${loginBusy ? 'Aguarde…' : reset ? 'Enviar link' : up ? 'Criar minha conta' : 'Entrar'}</button>
+          ${!up && !reset ? '<button class="btn ghost" type="button" data-act="lgmode" data-m="reset" style="align-self:center">Esqueci minha senha</button>' : ''}
+        </form>
+        ${reset ? '' : `<div class="lg-or"><span>ou</span></div>
+          <button class="btn wide lg-google" data-act="login" ${loginBusy ? 'disabled' : ''}>${icon.google} Continuar com Google</button>`}
+      </section>
+      ${installBanner(true)}
+      <p class="lg-foot">Seus treinos ficam salvos na sua conta e aparecem iguais no celular e no computador. Só você tem acesso.</p>
+    </div>`;
 }
-let loginErr = '';
+function authMsg(e){
+  const c = (e && e.code) || '';
+  if (/invalid-credential|wrong-password|user-not-found|invalid-login/.test(c)) return 'E-mail ou senha incorretos. Se você criou a conta com o Google, use "Continuar com Google".';
+  if (c.includes('email-already-in-use')) return 'Já existe uma conta com esse e-mail. Toque em "Entrar" (ou use "Continuar com Google", se foi assim que você criou).';
+  if (c.includes('weak-password')) return 'Senha fraca: use pelo menos 6 caracteres.';
+  if (c.includes('invalid-email') || c.includes('missing-email')) return 'Esse e-mail não parece válido. Confira se digitou certo.';
+  if (c.includes('too-many-requests')) return 'Muitas tentativas seguidas. Espere alguns minutos e tente de novo.';
+  if (c.includes('network-request-failed')) return 'Sem conexão com a internet. Confira e tente de novo.';
+  if (c.includes('operation-not-allowed')) return 'O login por e-mail ainda não está ativado neste app.';
+  if (c.includes('unauthorized-domain')) return 'Este endereço ainda não foi autorizado no Firebase.';
+  if (c.includes('popup-closed') || c.includes('cancelled')) return 'A janela do Google foi fechada antes de terminar. Tente de novo.';
+  if (c.includes('popup-blocked')) return 'O navegador bloqueou a janela do Google. Permita pop-ups ou use e-mail e senha.';
+  return 'Não deu para continuar agora (' + (c || 'erro desconhecido') + '). Tente de novo.';
+}
 async function doLogin(){
-  loginErr = '';
+  loginErr = ''; loginMsg = ''; loginBusy = true; render();
   try { await cloudRef.signIn(); location.reload(); }
-  catch(e){
-    const c = (e && e.code) || '';
-    loginErr = c.includes('unauthorized-domain') ? 'Este endereço ainda não foi autorizado no Firebase. Veja o passo 4 do LEIA-ME.'
-      : c.includes('popup-closed') || c.includes('cancelled') ? 'A janela de login foi fechada antes de terminar. Tente de novo.'
-      : 'Não deu para entrar agora (' + (c || 'erro desconhecido') + '). Confira a internet e tente de novo.';
-    render();
-  }
+  catch(e){ loginErr = authMsg(e); loginBusy = false; render(); }
+}
+async function doEmailAuth(){
+  if (!cloudRef || !cloudRef.signInEmail){ loginErr = 'O login ainda não carregou. Confira a internet e recarregue a página.'; render(); return; }
+  loginErr = ''; loginMsg = '';
+  const email = lg.email.trim();
+  if (!/^\S+@\S+\.\S+$/.test(email)){ loginErr = 'Digite um e-mail válido.'; render(); return; }
+  if (loginMode !== 'reset' && lg.pass.length < 6){ loginErr = 'A senha precisa ter pelo menos 6 caracteres.'; render(); return; }
+  if (loginMode === 'up' && lg.pass !== lg.pass2){ loginErr = 'As duas senhas não são iguais.'; render(); return; }
+  loginBusy = true; render();
+  try {
+    if (loginMode === 'reset'){
+      await cloudRef.resetPassword(email);
+      loginMsg = 'Pronto! Enviamos um link para ' + email + '. Abra o e-mail (confira também o spam) e crie a senha nova.';
+      loginMode = 'in'; loginBusy = false; render(); return;
+    }
+    if (loginMode === 'up') await cloudRef.signUpEmail(lg.name.trim(), email, lg.pass);
+    else await cloudRef.signInEmail(email, lg.pass);
+    lg.pass = lg.pass2 = '';
+    location.reload();
+  } catch(e){ loginErr = authMsg(e); loginBusy = false; lg.pass2 = ''; render(); }
 }
 function renderAccount(){
   const el = $('#sheet');
@@ -1389,6 +1596,7 @@ document.addEventListener('click', ev => {
     render(); window.scrollTo(0,0); return;
   }
   if (a === 'login'){ doLogin(); return; }
+  if (a === 'lgmode'){ loginMode = b.dataset.m; loginErr = ''; if (loginMode !== 'reset') loginMsg = ''; render(); const f = $('#lg-' + (loginMode === 'up' ? 'name' : 'email')); if (f) f.focus(); return; }
   if (a === 'install'){ doInstall(); return; }
   if (a === 'install-hide'){ try { localStorage.setItem('treino:installHide', String(Date.now())); } catch(e){} render(); return; }
   if (a === 'copyurl'){ const i = $('#in-url'); const done = () => toast('Endereço copiado'); if (navigator.clipboard) navigator.clipboard.writeText(i.value).then(done, () => { i.select(); }); else { i.select(); document.execCommand && document.execCommand('copy'); done(); } return; }
@@ -1470,6 +1678,7 @@ document.addEventListener('click', ev => {
 document.addEventListener('input', ev => {
   const t = ev.target;
   if (t.id === 'sh-load'){ const ex = findEx(openId); if (ex){ ex.load = t.value; savePlan(); if ((log.sets[ex.id] || 0) > 0) saveLog(); } return; }
+  if (t.dataset.lg){ lg[t.dataset.lg] = t.value; return; }
   if (bdraft && t.dataset.m){ bdraft[t.dataset.m] = t.value; return; }
   if (vdraft && t.dataset.vl != null){ vdraft[+t.dataset.vl].label = t.value; return; }
   if (vdraft && t.dataset.vu != null){ vdraft[+t.dataset.vu].url = t.value; return; }
@@ -1494,6 +1703,7 @@ document.addEventListener('change', ev => {
   else if (pdraft && t.dataset.pf) pdraft[t.dataset.pf] = t.value;
   else if (bdraft && t.dataset.m) bdraft[t.dataset.m] = t.value;
 });
+document.addEventListener('submit', ev => { if (ev.target.id === 'login-form'){ ev.preventDefault(); doEmailAuth(); } });
 document.addEventListener('keydown', ev => { if (ev.key === 'Escape' && (openId || openEntry)) closeSheet(); });
 
 init();

@@ -1,7 +1,7 @@
 """Gera os ícones do app sem bibliotecas externas.
 
-Desenho: fundo grafite com brilho no centro, anel de progresso vermelho (como a
-anilha da tela de treino) e um halter branco no meio, com anilhas vermelhas.
+Desenho: fundo espacial com grade, anel de progresso neon (ciano → violeta → rosa)
+e um halter branco com anilhas neon no meio.
 
 Uso:  python tools/gerar_icones.py
 """
@@ -18,39 +18,53 @@ def rrect(px, py, cx, cy, hw, hh, r):
     qx = abs(px - cx) - (hw - r); qy = abs(py - cy) - (hh - r)
     return math.hypot(max(qx, 0), max(qy, 0)) + min(max(qx, qy), 0) - r
 
-BG_IN, BG_OUT = (40, 44, 53), (12, 13, 17)
-TRACK = (52, 56, 66)
-RED, RED_DK = (232, 56, 36), (176, 34, 20)
-WHITE, SHADE = (246, 247, 249), (200, 204, 212)
+BG_IN, BG_OUT = (34, 22, 70), (4, 5, 14)
+TRACK = (34, 38, 70)
+CYAN, VIOLET, PINK = (34, 211, 238), (139, 92, 246), (236, 72, 153)
+WHITE, SHADE = (240, 244, 255), (176, 186, 230)
+
+def grad3(t):
+    t = max(0.0, min(1.0, t))
+    return mix(CYAN, VIOLET, t / .55) if t < .55 else mix(VIOLET, PINK, (t - .55) / .45)
 
 def pixel(u, v, k):
     """u,v em [0,1]; k = escala do desenho (1 normal, menor para ícone 'maskable')."""
     x = (u - .5) / k; y = (v - .5) / k
     d = math.hypot(x, y)
-    col = mix(BG_IN, BG_OUT, min(1, (math.hypot(u - .5, v - .42)) / .75))
-    # anel de progresso
-    R, w = .385, .055
+    col = mix(BG_IN, BG_OUT, min(1, math.hypot(u - .5, v - .38) / .72))
+    # grade sutil
+    gx = (u * 12) % 1; gy = (v * 12) % 1
+    if min(gx, 1 - gx) < .03 or min(gy, 1 - gy) < .03:
+        col = over(col, (70, 80, 150), .18 * max(0, 1 - d * 1.6))
+    R, w = .385, .05
+    a = (math.atan2(y, x) + math.pi / 2) % (2 * math.pi)
+    frac = a / (2 * math.pi)
+    on = frac <= .80
+    # brilho em volta do anel aceso
     ring = abs(d - R) - w / 2
+    if on and ring < .06:
+        col = over(col, grad3(frac / .8), .35 * (1 - max(0, ring) / .06) ** 2)
     if ring < .004:
-        a = (math.atan2(y, x) + math.pi / 2) % (2 * math.pi)
-        c = RED if a <= 2 * math.pi * .78 else TRACK
-        if a <= 2 * math.pi * .78:
-            c = mix(RED, RED_DK, (y + .4) / 1.6)  # leve degradê de cima para baixo
+        c = grad3(frac / .8) if on else TRACK
         col = over(col, c, (.004 - ring) / .008)
     # halter
     parts = [
-        (WHITE, rrect(x, y, 0, 0, .21, .028, .02)),          # barra
-        (RED, rrect(x, y, -.150, 0, .040, .150, .03)),       # anilhas grandes
-        (RED, rrect(x, y,  .150, 0, .040, .150, .03)),
-        (RED_DK, rrect(x, y, -.215, 0, .028, .100, .022)),   # anilhas menores
-        (RED_DK, rrect(x, y,  .215, 0, .028, .100, .022)),
-        (SHADE, rrect(x, y, -.262, 0, .022, .034, .012)),    # pontas
-        (SHADE, rrect(x, y,  .262, 0, .022, .034, .012)),
+        ('bar', rrect(x, y, 0, 0, .21, .026, .02)),
+        ('big', rrect(x, y, -.150, 0, .040, .150, .03)),
+        ('big', rrect(x, y,  .150, 0, .040, .150, .03)),
+        ('small', rrect(x, y, -.215, 0, .028, .100, .022)),
+        ('small', rrect(x, y,  .215, 0, .028, .100, .022)),
+        ('end', rrect(x, y, -.262, 0, .022, .034, .012)),
+        ('end', rrect(x, y,  .262, 0, .022, .034, .012)),
     ]
-    for c, dist in parts:
+    for kind, dist in parts:
+        if kind in ('big', 'small') and dist < .03:
+            col = over(col, CYAN if kind == 'big' else VIOLET, .25 * (1 - max(0, dist) / .03))
         if dist < .004:
-            if c is RED:
-                c = mix((246, 82, 60), RED_DK, (y + .15) / .3)  # brilho na anilha
+            if kind == 'bar': c = WHITE
+            elif kind == 'end': c = SHADE
+            elif kind == 'big': c = mix(CYAN, VIOLET, (y + .15) / .3)
+            else: c = mix(VIOLET, PINK, (y + .1) / .2)
             col = over(col, c, (.004 - dist) / .008)
     return col
 

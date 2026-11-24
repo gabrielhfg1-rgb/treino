@@ -68,6 +68,18 @@ async function start() {
         throw e;
       }
     },
+    // login com e-mail e senha
+    async signInEmail(email, pass) {
+      await A.signInWithEmailAndPassword(auth, email, pass);
+    },
+    async signUpEmail(name, email, pass) {
+      const cred = await A.createUserWithEmailAndPassword(auth, email, pass);
+      if (name) await A.updateProfile(cred.user, { displayName: name }).catch(() => {});
+    },
+    async resetPassword(email) {
+      auth.languageCode = 'pt-BR';
+      await A.sendPasswordResetEmail(auth, email);
+    },
     signOut: () => A.signOut(auth),
   };
 }
