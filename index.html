@@ -499,6 +499,65 @@ h1,h2,h3{font-weight:700;letter-spacing:.02em}
 .pl-mute.off{border-color:rgba(255,92,138,.5);background:rgba(255,92,138,.12);color:#ffc2d3;box-shadow:0 0 14px rgba(255,92,138,.25)}
 .pl-note{margin:0;text-align:center;font-size:.78rem;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){.player{animation:none}}
+/* progresso futurista */
+.prog-hero .prog-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.prog-hero h1{font-size:clamp(1.9rem,8.5vw,2.5rem)}
+.ring{flex:none;width:122px;height:122px}
+.ring-svg{width:100%;height:100%;overflow:visible}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.kpis div{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 10px 9px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--iron-line);min-width:0}
+.kpis b{font-family:var(--display);font-size:1.45rem;line-height:1;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.kpis small{font-size:.62rem;line-height:1.2;color:var(--iron-muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+@media (max-width:360px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.chart .tip{background:rgba(10,14,34,.94);color:#eef4ff;border:1px solid rgba(34,211,238,.45);box-shadow:0 0 18px rgba(34,211,238,.35);border-radius:12px}
+.chart .tip b{color:#9befff}
+.stat3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat3 div{padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--line);display:flex;flex-direction:column;gap:3px;min-width:0}
+.stat3 small{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9fb0e8}
+.stat3 b{font-family:var(--display);font-size:1.5rem;line-height:1;color:#f2f5ff}
+.stat3 b i{font-style:normal;font-size:.75rem;color:var(--muted);margin-left:3px}
+.stat3 em{font-style:normal;font-size:.72rem;color:var(--muted)}
+.stat3 .pr{border-color:rgba(236,72,153,.45);box-shadow:0 0 16px rgba(236,72,153,.18) inset}
+.stat3 .pr b{color:#ff9fd0}
+.stat3 .up b{color:#7dffc4}.stat3 .down b{color:#ffc2d3}
+/* calendário */
+.cal-nav{display:flex;align-items:center;gap:8px}
+.cal-nav b{font-family:var(--display);font-size:.95rem;letter-spacing:.06em;min-width:8.5em;text-align:center;text-transform:uppercase}
+.cal-nav .mini{border-color:var(--line);color:var(--fg);align-self:center}
+.cal-sum{display:flex;gap:8px;flex-wrap:wrap}
+.cs{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:700;padding:4px 10px;border-radius:99px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.cs i{width:8px;height:8px;border-radius:50%}
+.cs.done i{background:#34f5a4;box-shadow:0 0 8px #34f5a4}.cs.miss i{background:#ff5c8a;box-shadow:0 0 8px #ff5c8a}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.cal-h{text-align:center;font-size:.64rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7f88b0;padding-bottom:2px}
+.cal-cell{position:relative;aspect-ratio:1;border-radius:12px;border:1px solid transparent;background:rgba(255,255,255,.025);color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:0;font:inherit;min-width:0}
+.cal-cell.empty{background:none}
+.cal-n{font-family:var(--display);font-weight:600;font-size:.9rem;line-height:1}
+.cal-b{font-family:var(--display);font-weight:700;font-size:.62rem;line-height:1;letter-spacing:.04em}
+.cal-cell.rest{opacity:.55}
+.cal-cell.plan,.cal-cell.today{border:1px dashed color-mix(in srgb,var(--pc,#22d3ee) 70%,transparent);color:var(--fg)}
+.cal-cell.plan .cal-b,.cal-cell.today .cal-b{color:var(--pc,#22d3ee)}
+.cal-cell.done{color:#04140c;background:#34f5a4;border-color:#34f5a4}
+.cal-cell.done.l1{background:rgba(52,245,164,.45);color:#eafff5;border-color:rgba(52,245,164,.6)}
+.cal-cell.done.l2{background:rgba(52,245,164,.72);color:#03140c}
+.cal-cell.done.l3{box-shadow:0 0 14px rgba(52,245,164,.6)}
+.cal-cell.miss{border:1px solid rgba(255,92,138,.55);background:rgba(255,92,138,.08);color:#ffc2d3}
+.cal-cell.miss::after{content:"";position:absolute;width:5px;height:5px;border-radius:50%;background:#ff5c8a;top:5px;right:5px;box-shadow:0 0 6px #ff5c8a}
+.cal-cell.is-today{outline:2px solid #22d3ee;outline-offset:1px;box-shadow:0 0 14px rgba(34,211,238,.5)}
+.cal-cell.sel{transform:scale(1.06);z-index:1;box-shadow:0 0 0 2px #fff,0 0 18px rgba(255,255,255,.35)}
+.cal-legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.74rem;color:var(--muted)}
+.cal-legend span{display:inline-flex;align-items:center;gap:6px}
+.cal-legend i{width:14px;height:14px;border-radius:4px;display:inline-block}
+.lg-done{background:#34f5a4;box-shadow:0 0 8px rgba(52,245,164,.6)}
+.lg-plan{border:1px dashed #22d3ee}
+.lg-miss{border:1px solid #ff5c8a;background:rgba(255,92,138,.12)}
+.lg-rest{background:rgba(255,255,255,.05)}
+.cal-det{display:flex;flex-direction:column;gap:6px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--line);border-left:3px solid #22d3ee}
+.cal-det.done{border-left-color:#34f5a4}.cal-det.miss{border-left-color:#ff5c8a}.cal-det.rest{border-left-color:var(--line)}
+.cal-det b{font-family:var(--display);font-size:1.05rem;letter-spacing:.02em}
+.cal-det ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.cal-det li{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-top:1px solid var(--line);font-size:.86rem}
+.cal-det li em{font-style:normal;color:#9befff;white-space:nowrap;font-variant-numeric:tabular-nums}
 /* ajustes para a fonte técnica, que é mais larga */
 .hero h1{font-size:clamp(2.1rem,10vw,3rem);line-height:.95;overflow-wrap:normal}
 .big b{font-size:clamp(3.4rem,17vw,4.6rem)}
@@ -1178,15 +1237,26 @@ function renderBody(){
 }
 
 function niceStep(r){ if (!(r > 0)) return 1; const e = Math.pow(10, Math.floor(Math.log10(r))), f = r/e; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * e; }
-const CW = 400, CH = 220, CL = 42, CR = 14, CT = 20, CB = 28;
+const CW = 400, CH = 230, CL = 40, CR = 16, CT = 26, CB = 30;
 const CHARTS = {};
-/* gráfico de linha genérico: pts = [{date, v}] em ordem de data */
-function lineChart(id, pts, unit, label, dec){
+/* definições SVG de degradê e brilho, uma por gráfico */
+function neonDefs(id){
+  return `<defs>
+    <linearGradient id="${id}-st" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#22d3ee"/><stop offset=".55" stop-color="#8b5cf6"/><stop offset="1" stop-color="#ec4899"/></linearGradient>
+    <linearGradient id="${id}-ar" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#22d3ee" stop-opacity=".32"/><stop offset=".6" stop-color="#8b5cf6" stop-opacity=".10"/><stop offset="1" stop-color="#8b5cf6" stop-opacity="0"/></linearGradient>
+    <linearGradient id="${id}-bar" x1="0" x2="0" y1="1" y2="0"><stop offset="0" stop-color="#8b5cf6" stop-opacity=".55"/><stop offset="1" stop-color="#22d3ee"/></linearGradient>
+    <linearGradient id="${id}-cur" x1="0" x2="0" y1="1" y2="0"><stop offset="0" stop-color="#8b5cf6"/><stop offset="1" stop-color="#ec4899"/></linearGradient>
+    <filter id="${id}-glow" x="-20%" y="-40%" width="140%" height="180%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>`;
+}
+/* gráfico de linha neon: pts = [{date, v, note}] em ordem de data */
+function lineChart(id, pts, unit, label, dec, opts){
+  opts = opts || {};
   if (!pts.length) return '';
   const ts = pts.map(p => Date.parse(p.date + 'T12:00'));
   let t0 = Math.min(...ts), t1 = Math.max(...ts); if (t0 === t1){ t0 -= 7*864e5; t1 += 7*864e5; }
   let lo = Math.min(...pts.map(p => p.v)), hi = Math.max(...pts.map(p => p.v));
-  const pad = (hi - lo) * 0.2 || Math.max(1, Math.abs(hi) * 0.03); lo -= pad; hi += pad;
+  const pad = (hi - lo) * 0.25 || Math.max(1, Math.abs(hi) * 0.04); lo -= pad; hi += pad;
   if (lo < 0 && Math.min(...pts.map(p => p.v)) >= 0) lo = 0;
   const step = niceStep((hi - lo) / 4); lo = Math.floor(lo/step)*step; hi = Math.ceil(hi/step)*step;
   const tdec = step < 1 ? 1 : 0;
@@ -1195,20 +1265,29 @@ function lineChart(id, pts, unit, label, dec){
   let grid = '';
   for (let v = lo; v <= hi + step/1e6; v += step){
     const yy = y(v).toFixed(1);
-    grid += `<line x1="${CL}" x2="${CW-CR}" y1="${yy}" y2="${yy}" stroke="var(--line)" stroke-width="1"/><text x="${CL-8}" y="${yy}" dy="4" text-anchor="end" font-size="12" fill="var(--muted)">${fmt(v,tdec)}</text>`;
+    grid += `<line x1="${CL}" x2="${CW-CR}" y1="${yy}" y2="${yy}" stroke="rgba(130,150,255,.13)" stroke-dasharray="2 5"/><text x="${CL-8}" y="${yy}" dy="4" text-anchor="end" font-size="11" fill="#7f88b0">${fmt(v,tdec)}</text>`;
   }
   const xl = [P[0]]; if (P.length > 1) xl.push(P[P.length-1]);
-  const xlab = xl.map((p,i) => `<text x="${p.x.toFixed(1)}" y="${CH-8}" text-anchor="${xl.length===1?'middle':i===0?'start':'end'}" font-size="12" fill="var(--muted)">${esc(fmtDate(p.date))}</text>`).join('');
+  const xlab = xl.map((p,i) => `<text x="${p.x.toFixed(1)}" y="${CH-9}" text-anchor="${xl.length===1?'middle':i===0?'start':'end'}" font-size="11" fill="#7f88b0" letter-spacing=".04em">${esc(fmtDate(p.date))}</text>`).join('');
   const line = P.map((p,i) => (i ? 'L' : 'M') + p.x.toFixed(1) + ' ' + p.y.toFixed(1)).join(' ');
-  const area = P.length > 1 ? `<path d="${line} L${P[P.length-1].x.toFixed(1)} ${CH-CB} L${P[0].x.toFixed(1)} ${CH-CB} Z" fill="var(--accent)" opacity=".08"/>` : '';
+  const base = CH - CB;
+  const area = P.length > 1 ? `<path d="${line} L${P[P.length-1].x.toFixed(1)} ${base} L${P[0].x.toFixed(1)} ${base} Z" fill="url(#${id}-ar)"/>` : '';
   const last = P[P.length-1];
-  return `<svg viewBox="0 0 ${CW} ${CH}" role="img" aria-label="${esc(label)} ao longo do tempo">
+  const prI = opts.pr ? P.reduce((b, p, i) => p.v > P[b].v ? i : b, 0) : -1;
+  const valTxt = fmt(last.v, dec ?? 1) + (unit ? ' ' + unit : '');
+  const tw = valTxt.length * 7 + 18, tx = Math.min(Math.max(last.x - tw/2, CL), CW - CR - tw), ty = Math.max(last.y - 34, 2);
+  return `<svg viewBox="0 0 ${CW} ${CH}" role="img" aria-label="${esc(label)} ao longo do tempo">${neonDefs(id)}
     ${grid}${xlab}${area}
-    <path d="${line}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-    ${P.map((p,i) => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${i===P.length-1?5:4}" fill="var(--accent)" stroke="var(--surface)" stroke-width="2"/>`).join('')}
-    <text x="${Math.min(last.x, CW-CR).toFixed(1)}" y="${(last.y-12).toFixed(1)}" text-anchor="${P.length>1?'end':'middle'}" font-size="13" font-weight="700" fill="var(--fg)">${fmt(last.v, dec ?? 1)}${unit ? ' '+esc(unit) : ''}</text>
-    <line class="xh" x1="0" x2="0" y1="${CT}" y2="${CH-CB}" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3 3" visibility="hidden"/>
-    <circle class="xp" r="6" fill="var(--accent)" stroke="var(--surface)" stroke-width="2" visibility="hidden"/>
+    ${P.length > 1 ? `<path d="${line}" fill="none" stroke="url(#${id}-st)" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" opacity=".35" filter="url(#${id}-glow)"/>
+    <path d="${line}" fill="none" stroke="url(#${id}-st)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>` : ''}
+    ${P.map((p,i) => i === P.length-1 ? '' : `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3.2" fill="#05060d" stroke="#8fe9ff" stroke-width="1.6"/>`).join('')}
+    ${prI >= 0 && prI !== P.length-1 ? `<g><circle cx="${P[prI].x.toFixed(1)}" cy="${P[prI].y.toFixed(1)}" r="5" fill="#ec4899" filter="url(#${id}-glow)"/><text x="${P[prI].x.toFixed(1)}" y="${(P[prI].y-10).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="700" fill="#ff9fd0" letter-spacing=".08em">RECORDE</text></g>` : ''}
+    <circle cx="${last.x.toFixed(1)}" cy="${last.y.toFixed(1)}" r="11" fill="#22d3ee" opacity=".18"/>
+    <circle cx="${last.x.toFixed(1)}" cy="${last.y.toFixed(1)}" r="5.5" fill="#e9fbff" stroke="${prI === P.length-1 ? '#ec4899' : '#22d3ee'}" stroke-width="2.5" filter="url(#${id}-glow)"/>
+    <g><rect x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" width="${tw}" height="22" rx="11" fill="rgba(10,14,34,.9)" stroke="url(#${id}-st)"/>
+    <text x="${(tx + tw/2).toFixed(1)}" y="${(ty + 15).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="700" fill="#eef4ff">${esc(valTxt)}${prI === P.length-1 ? ' ★' : ''}</text></g>
+    <line class="xh" x1="0" x2="0" y1="${CT}" y2="${base}" stroke="url(#${id}-st)" stroke-width="1.2" visibility="hidden"/>
+    <circle class="xp" r="6.5" fill="#05060d" stroke="#22d3ee" stroke-width="2.5" visibility="hidden" filter="url(#${id}-glow)"/>
     <rect x="0" y="0" width="${CW}" height="${CH}" fill="transparent"/>
   </svg><div class="tip" hidden></div>`;
 }
@@ -1223,7 +1302,7 @@ function bindChart(id){
     xh.setAttribute('x1', best.x); xh.setAttribute('x2', best.x); xh.setAttribute('visibility', 'visible');
     xp.setAttribute('cx', best.x); xp.setAttribute('cy', best.y); xp.setAttribute('visibility', 'visible');
     tip.innerHTML = `<b>${fmt(best.v, best.dec ?? 1)}${best.unit ? ' '+esc(best.unit) : ''}</b>${esc(fmtDate(best.date, true))}${best.note ? ' · ' + esc(best.note) : ''}`;
-    tip.style.left = Math.max(14, Math.min(86, best.x/CW*100)) + '%'; tip.style.top = (best.y/CH*100) + '%'; tip.hidden = false;
+    tip.style.left = Math.max(16, Math.min(84, best.x/CW*100)) + '%'; tip.style.top = (best.y/CH*100) + '%'; tip.hidden = false;
   };
   const hide = () => { tip.hidden = true; xh.setAttribute('visibility','hidden'); xp.setAttribute('visibility','hidden'); };
   svg.addEventListener('pointermove', show); svg.addEventListener('pointerdown', show); svg.addEventListener('pointerleave', hide);
@@ -1234,7 +1313,7 @@ function chartSVG(k){
 }
 
 /* ---------- progresso do treino ---------- */
-let trainLog = {}, progEx = null;
+let trainLog = {}, progEx = null, calMonth = null, calSel = null;
 const keyOf = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 const parseKg = s => { const m = String(s || '').replace(',', '.').match(/\d+(\.\d+)?/); return m ? parseFloat(m[0]) : null; };
 const repsNum = s => { const r = String(s || ''); const m = r.match(/(\d+)\s*[-a–]\s*(\d+)/); if (m) return (+m[1] + +m[2]) / 2; const n = r.match(/\d+/); return n ? +n[0] : null; };
@@ -1245,10 +1324,15 @@ function weekCounts(n){
   const mon = mondayOf(today), out = [];
   for (let i = n - 1; i >= 0; i--){
     const s = new Date(mon); s.setDate(mon.getDate() - 7*i);
-    let c = 0; for (let j = 0; j < 7; j++){ const d = new Date(s); d.setDate(s.getDate() + j); if (setsOf(trainLog[keyOf(d)]) > 0) c++; }
-    out.push({start:s, count:c});
+    let c = 0, sets = 0; for (let j = 0; j < 7; j++){ const d = new Date(s); d.setDate(s.getDate() + j); const q = setsOf(trainLog[keyOf(d)]); if (q > 0){ c++; sets += q; } }
+    out.push({start:s, count:c, sets});
   }
   return out;
+}
+function weekGoal(){ // quantos dias da semana têm treino no plano atual
+  if (!plan || !plan.days) return 3;
+  const set = new Set(); plan.days.forEach(d => (d.weekdays || []).forEach(w => set.add(w)));
+  return set.size || 3;
 }
 function streakWeeks(){
   const w = weekCounts(104); let i = w.length - 1, s = 0;
@@ -1277,45 +1361,106 @@ function volumeSeries(){
     return any ? {date:k, v, note: trainLog[k].label || ''} : null;
   }).filter(Boolean);
 }
-function barsSVG(weeks){
-  const W = 400, H = 190, L = 6, R = 6, T = 24, B = 28, n = weeks.length;
-  const max = Math.max(3, ...weeks.map(w => w.count));
-  const slot = (W - L - R) / n, bw = Math.min(24, slot * 0.62);
-  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Treinos por semana nas últimas ${n} semanas"><line x1="${L}" x2="${W-R}" y1="${H-B}" y2="${H-B}" stroke="var(--line)"/>`;
+/* barras neon de treinos por semana, com a linha da meta */
+function barsSVG(weeks, goal){
+  const id = 'wk', W = 400, H = 200, L = 8, R = 8, T = 28, B = 30, n = weeks.length;
+  const max = Math.max(goal + 1, ...weeks.map(w => w.count));
+  const slot = (W - L - R) / n, bw = Math.min(20, slot * 0.56), yv = v => H - B - (H - T - B) * v / max;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Treinos por semana nas últimas ${n} semanas, meta de ${goal}">${neonDefs(id)}`;
   weeks.forEach((w,i) => {
-    const cx = L + slot*i + slot/2, h = w.count ? Math.max(6, (H - T - B) * w.count / max) : 0, y = H - B - h, cur = i === n - 1;
-    if (h) s += `<path d="M${(cx-bw/2).toFixed(1)} ${H-B} V${(y+4).toFixed(1)} Q${(cx-bw/2).toFixed(1)} ${y.toFixed(1)} ${(cx-bw/2+4).toFixed(1)} ${y.toFixed(1)} H${(cx+bw/2-4).toFixed(1)} Q${(cx+bw/2).toFixed(1)} ${y.toFixed(1)} ${(cx+bw/2).toFixed(1)} ${(y+4).toFixed(1)} V${H-B} Z" fill="var(--accent)" opacity="${cur ? 1 : .75}"><title>Semana de ${fmtDate(keyOf(w.start))}: ${w.count} treino${w.count===1?'':'s'}</title></path>
-      <text x="${cx.toFixed(1)}" y="${(y-7).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="700" fill="var(--fg)">${w.count}</text>`;
-    else s += `<circle cx="${cx.toFixed(1)}" cy="${H-B-4}" r="2.5" fill="var(--line)"><title>Semana de ${fmtDate(keyOf(w.start))}: nenhum treino</title></circle>`;
-    if (i % 3 === 0 || cur) s += `<text x="${cx.toFixed(1)}" y="${H-10}" text-anchor="middle" font-size="11" fill="var(--muted)">${cur ? 'esta' : esc(fmtDate(keyOf(w.start)))}</text>`;
+    const cx = L + slot*i + slot/2, cur = i === n - 1;
+    s += `<rect x="${(cx-bw/2).toFixed(1)}" y="${T}" width="${bw}" height="${H-B-T}" rx="${bw/2}" fill="rgba(130,150,255,.06)"/>`;
+    if (w.count){
+      const y = yv(w.count), h = H - B - y, hit = w.count >= goal;
+      s += `<rect x="${(cx-bw/2).toFixed(1)}" y="${y.toFixed(1)}" width="${bw}" height="${h.toFixed(1)}" rx="${bw/2}" fill="url(#${id}-${cur ? 'cur' : 'bar'})" ${hit || cur ? `filter="url(#${id}-glow)"` : 'opacity=".8"'}><title>Semana de ${fmtDate(keyOf(w.start))}: ${w.count} treino${w.count===1?'':'s'}</title></rect>
+        <text x="${cx.toFixed(1)}" y="${(y-8).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="700" fill="${hit ? '#9befff' : '#cfd6ff'}">${w.count}</text>`;
+    }
+    if (i % 3 === 0 || cur) s += `<text x="${cx.toFixed(1)}" y="${H-10}" text-anchor="middle" font-size="10.5" fill="${cur ? '#ff9fd0' : '#7f88b0'}" font-weight="${cur ? 700 : 400}">${cur ? 'ESTA' : esc(fmtDate(keyOf(w.start)))}</text>`;
   });
+  const gy = yv(goal).toFixed(1);
+  s += `<line x1="${L}" x2="${W-R}" y1="${gy}" y2="${gy}" stroke="#34f5a4" stroke-width="1.3" stroke-dasharray="5 5" opacity=".85"/>
+    <rect x="${W-R-62}" y="${(gy-19)}" width="62" height="16" rx="8" fill="rgba(52,245,164,.14)" stroke="rgba(52,245,164,.5)"/>
+    <text x="${W-R-31}" y="${(+gy-7.5)}" text-anchor="middle" font-size="10" font-weight="700" fill="#9dffd2" letter-spacing=".06em">META ${goal}</text>`;
   return s + '</svg>';
 }
-function heatmap(nWeeks){
-  const mon = mondayOf(today), start = new Date(mon); start.setDate(mon.getDate() - 7*(nWeeks-1));
-  const lvl = c => c === 0 ? 0 : c <= 5 ? 1 : c <= 10 ? 2 : c <= 15 ? 3 : 4;
-  let cols = '';
-  for (let w = 0; w < nWeeks; w++){
-    let cells = '';
-    for (let d = 0; d < 7; d++){
-      const day = new Date(start); day.setDate(start.getDate() + 7*w + d);
-      const k = keyOf(day), c = setsOf(trainLog[k]), fut = day > today;
-      cells += `<i class="hm l${fut ? 'x' : lvl(c)}${k === logKey ? ' now' : ''}" title="${esc(fmtDate(k, true))}: ${fut ? '' : c ? c + ' séries' : 'sem treino'}"></i>`;
-    }
-    cols += `<div class="hm-col">${cells}</div>`;
-  }
-  return `<div class="hm-wrap"><div class="hm-days">${['seg','','qua','','sex','','dom'].map(t => `<span>${t}</span>`).join('')}</div><div class="hm-grid">${cols}</div></div>
-    <div class="hm-legend"><span>Menos</span>${[0,1,2,3,4].map(l => `<i class="hm l${l}"></i>`).join('')}<span>Mais séries</span></div>`;
+/* anel de progresso da semana */
+function weekRing(done, goal){
+  const r = 44, C = 2*Math.PI*r, f = Math.min(1, goal ? done/goal : 0);
+  return `<svg viewBox="0 0 120 120" class="ring-svg" aria-hidden="true">${neonDefs('rg')}
+    <circle cx="60" cy="60" r="${r}" fill="none" stroke="rgba(130,150,255,.14)" stroke-width="10"/>
+    ${f > 0 ? `<circle cx="60" cy="60" r="${r}" fill="none" stroke="url(#rg-st)" stroke-width="10" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C*(1-f)).toFixed(1)}" transform="rotate(-90 60 60)" filter="url(#rg-glow)"/>` : ''}
+    <text x="60" y="58" text-anchor="middle" font-family="Chakra Petch, sans-serif" font-weight="700" font-size="28" fill="#f2f5ff">${done}<tspan font-size="16" fill="#8e97bd">/${goal}</tspan></text>
+    <text x="60" y="78" text-anchor="middle" font-size="9.5" font-weight="700" fill="#7fe6f7" letter-spacing=".14em">TREINOS</text>
+  </svg>`;
 }
+
+/* ---------- calendário do mês ---------- */
+const MES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+function dayInfo(k, d){
+  const l = trainLog[k], sets = setsOf(l), wd = d.getDay(), planned = dayFor(wd);
+  const first = trainedDates()[0];
+  if (sets > 0) return {st:'done', sets, label:l.label || (planned ? planned.label : 'Treino'), badge: l.label ? badgeOf({label:l.label.split(' + ')[0]}) : planned ? badgeOf(planned) : '✓', day:planned};
+  if (k === logKey) return {st: planned ? 'today' : 'rest', day:planned, badge: planned ? badgeOf(planned) : ''};
+  if (k > logKey) return {st: planned ? 'plan' : 'rest', day:planned, badge: planned ? badgeOf(planned) : ''};
+  if (planned && first && k > first) return {st:'miss', day:planned, badge: badgeOf(planned)};
+  return {st:'rest', day:planned};
+}
+function calendarCard(){
+  if (!calMonth) calMonth = new Date(today.getFullYear(), today.getMonth(), 1, 12);
+  if (!calSel) calSel = logKey;
+  const y = calMonth.getFullYear(), m = calMonth.getMonth(), days = new Date(y, m + 1, 0).getDate();
+  const lead = (new Date(y, m, 1).getDay() + 6) % 7;
+  let cells = '', done = 0, miss = 0;
+  for (let i = 0; i < lead; i++) cells += '<span class="cal-cell empty"></span>';
+  for (let dn = 1; dn <= days; dn++){
+    const d = new Date(y, m, dn, 12), k = keyOf(d), info = dayInfo(k, d);
+    if (info.st === 'done') done++; if (info.st === 'miss') miss++;
+    const lvl = info.st === 'done' ? (info.sets >= 16 ? 3 : info.sets >= 8 ? 2 : 1) : 0;
+    const pc = info.day ? pcOf(info.day) : '';
+    cells += `<button class="cal-cell ${info.st}${lvl ? ' l' + lvl : ''}${k === logKey ? ' is-today' : ''}${k === calSel ? ' sel' : ''}" data-act="calday" data-k="${k}" style="${pc}" aria-label="${esc(fmtDate(k, true))}: ${{done:'treinou', miss:'faltou', plan:'treino programado', today:'treino de hoje', rest:'descanso'}[info.st]}">
+      <span class="cal-n">${dn}</span>${info.badge && info.st !== 'rest' ? `<span class="cal-b">${esc(info.badge)}</span>` : ''}</button>`;
+  }
+  const canNext = new Date(y, m + 1, 1) <= new Date(today.getFullYear(), today.getMonth() + 2, 1);
+  return `<div class="card cal-card"><div class="card-top"><h2>Calendário</h2>
+      <div class="cal-nav"><button class="mini" data-act="calprev" aria-label="Mês anterior">${icon.up.replace('M6 15l6-6 6 6','M15 6l-6 6 6 6')}</button>
+      <b>${MES[m]} ${y}</b>
+      <button class="mini" data-act="calnext" aria-label="Próximo mês" ${canNext ? '' : 'disabled'}>${icon.up.replace('M6 15l6-6 6 6','M9 6l6 6-6 6')}</button></div></div>
+    <div class="cal-sum"><span class="cs done"><i></i>${done} treino${done===1?'':'s'}</span>${miss ? `<span class="cs miss"><i></i>${miss} falta${miss===1?'':'s'}</span>` : ''}</div>
+    <div class="cal-grid">${['seg','ter','qua','qui','sex','sáb','dom'].map(t => `<span class="cal-h">${t}</span>`).join('')}${cells}</div>
+    <div class="cal-legend"><span><i class="lg-done"></i>Treinou</span><span><i class="lg-plan"></i>Programado</span><span><i class="lg-miss"></i>Faltou</span><span><i class="lg-rest"></i>Descanso</span></div>
+    ${calDetail()}
+  </div>`;
+}
+function calDetail(){
+  const k = calSel; if (!k) return '';
+  const d = new Date(k + 'T12:00'), info = dayInfo(k, d), l = trainLog[k];
+  const head = `<span class="eyebrow">${esc(WD_FULL[d.getDay()])}, ${d.getDate()} de ${MONTHS[d.getMonth()]}</span>`;
+  if (info.st === 'done'){
+    const ex = Object.values(l.ex || {}).filter(e => e.n > 0);
+    return `<div class="cal-det done">${head}<b>${esc(info.label)} · ${info.sets} séries</b>
+      ${ex.length ? `<ul>${ex.map(e => `<li><span>${esc(e.name)}</span><em>${e.n}×${e.reps ?? '—'}${e.kg != null ? ' · ' + fmt(e.kg) + ' kg' : ''}</em></li>`).join('')}</ul>` : '<p class="muted" style="margin:0">Séries marcadas sem detalhes de carga.</p>'}</div>`;
+  }
+  const txt = {miss:'Treino programado que não foi marcado.', plan:'Treino programado para este dia.', today:'Treino de hoje: marque as séries na aba Treino.', rest:'Dia de descanso.'}[info.st];
+  return `<div class="cal-det ${info.st}">${head}<b>${info.day ? esc(info.day.label) + (info.day.focus ? ' · ' + esc(info.day.focus) : '') : 'Descanso'}</b><p class="muted" style="margin:0">${txt}</p></div>`;
+}
+
 function renderProg(){
-  const app = $('#app'), dates = trainedDates(), weeks = weekCounts(12), thisWeek = weeks[weeks.length-1].count;
-  const streak = streakWeeks(), series = exerciseSeries(), vol = volumeSeries();
-  const avg = weeks.slice(0, -1).reduce((s,w) => s + w.count, 0) / Math.max(1, weeks.length - 1);
-  const hero = `<section class="hero" style="--pc:var(--accent)"><span class="eyebrow">Progresso · esta semana</span>
-    <div class="big"><b>${thisWeek}</b><span>treino${thisWeek===1?'':'s'}</span></div>
-    <div class="hero-meta"><span>${streak} semana${streak===1?'':'s'} seguida${streak===1?'':'s'}</span><span>${dates.length} treinos no total</span><span>média ${fmt(avg)} por semana</span></div></section>`;
+  const app = $('#app'), dates = trainedDates(), weeks = weekCounts(12), cur = weeks[weeks.length-1], thisWeek = cur.count;
+  const goal = weekGoal(), streak = streakWeeks(), series = exerciseSeries(), vol = volumeSeries();
+  const past = weeks.slice(0, -1), avg = past.reduce((s,w) => s + w.count, 0) / Math.max(1, past.length);
+  const hero = `<section class="hero prog-hero" style="--pc:var(--accent)">
+    <div class="prog-top"><div style="min-width:0"><span class="eyebrow">Progresso · esta semana</span>
+      <h1>${thisWeek >= goal ? 'Meta batida!' : thisWeek ? 'Em ritmo' : 'Bora começar'}</h1>
+      <p class="focus" style="margin:0">${thisWeek >= goal ? 'Você fez todos os treinos da semana.' : `Faltam ${goal - thisWeek} treino${goal - thisWeek === 1 ? '' : 's'} para a meta de ${goal}.`}</p></div>
+      <div class="ring">${weekRing(thisWeek, goal)}</div></div>
+    <div class="kpis">
+      <div><b>${streak}</b><small>semana${streak===1?'':'s'} seguida${streak===1?'':'s'}</small></div>
+      <div><b>${dates.length}</b><small>treinos no total</small></div>
+      <div><b>${cur.sets}</b><small>séries na semana</small></div>
+      <div><b>${fmt(avg)}</b><small>média por semana</small></div>
+    </div></section>`;
   if (!dates.length){
-    app.innerHTML = `${topbar()}${hero}<div class="empty"><h2>Seus gráficos aparecem aqui</h2>
+    app.innerHTML = `${topbar()}${hero}${calendarCard()}<div class="empty"><h2>Seus gráficos aparecem aqui</h2>
       <p class="muted">Marque as séries na tela de treino e anote a carga de cada exercício. A partir do primeiro treino o app monta a frequência, o calendário, a evolução de carga e o volume.</p>
       <div><button class="btn primary" data-act="tab" data-v="today">Ir para o treino</button></div></div>`;
     return;
@@ -1328,17 +1473,19 @@ function renderProg(){
     const diff = last.v - first.v;
     loadCard = `<div class="card"><div class="card-top"><h2>Carga por exercício</h2></div>
       <label class="field"><span>Exercício</span><select id="prog-ex" data-progex="1">${series.map(s => `<option value="${esc(s.id)}"${s.id===progEx?' selected':''}>${esc(s.name)}</option>`).join('')}</select></label>
-      <div class="kv">
-        <div><small>Recorde</small><b>${fmt(pr)} kg</b><em>${esc(fmtDate(prPt.date, true))}</em></div>
-        <div><small>Evolução</small><b>${sel.pts.length > 1 ? (diff > 0 ? '+' : '') + fmt(diff) + ' kg' : '—'}</b><em>${sel.pts.length > 1 ? 'desde ' + esc(fmtDate(first.date)) : 'primeiro registro'}</em></div>
+      <div class="stat3">
+        <div><small>Atual</small><b>${fmt(last.v)}<i>kg</i></b></div>
+        <div class="pr"><small>Recorde</small><b>${fmt(pr)}<i>kg</i></b><em>${esc(fmtDate(prPt.date))}</em></div>
+        <div class="${diff > 0 ? 'up' : diff < 0 ? 'down' : ''}"><small>Evolução</small><b>${sel.pts.length > 1 ? (diff > 0 ? '+' : '') + fmt(diff) : '—'}<i>${sel.pts.length > 1 ? 'kg' : ''}</i></b><em>${sel.pts.length > 1 ? 'desde ' + esc(fmtDate(first.date)) : '1º registro'}</em></div>
       </div>
-      <div class="chart" id="chart-load">${lineChart('chart-load', sel.pts, 'kg', 'Carga de ' + sel.name)}</div></div>`;
+      <div class="chart" id="chart-load">${lineChart('chart-load', sel.pts, 'kg', 'Carga de ' + sel.name, 1, {pr:true})}</div></div>`;
   }
-  const volCard = vol.length ? `<div class="card"><h2>Volume por treino</h2><p class="muted" style="margin:0;font-size:.86rem">Séries × repetições × carga somados em cada dia. Subir com o tempo indica mais trabalho total.</p>
+  const volCard = vol.length ? `<div class="card"><h2>Volume por treino</h2><p class="muted" style="margin:0;font-size:.86rem">Séries × repetições × carga somados em cada dia. Linha subindo = mais trabalho total.</p>
       <div class="chart" id="chart-vol">${lineChart('chart-vol', vol, 'kg', 'Volume por treino', 0)}</div></div>` : '';
   app.innerHTML = `${topbar()}${hero}
-    <div class="card"><h2>Treinos por semana</h2><div class="chart">${barsSVG(weeks)}</div></div>
-    <div class="card"><h2>Calendário</h2><div class="hm-scroll">${heatmap(16)}</div></div>
+    ${calendarCard()}
+    <div class="card"><div class="card-top"><h2>Treinos por semana</h2><span class="pill">últimas 12</span></div><div class="chart">${barsSVG(weeks, goal)}</div>
+      <p class="muted" style="margin:0;font-size:.82rem">A linha verde é a sua meta: ${goal} treinos por semana, conforme o seu plano.</p></div>
     ${loadCard}${volCard}
     <div class="foot"><small>Os gráficos usam as séries marcadas e as cargas anotadas em cada dia.</small></div>`;
   bindChart('chart-load'); bindChart('chart-vol');
@@ -1680,6 +1827,8 @@ document.addEventListener('click', ev => {
   if (a === 'play'){ if (openPlayer(b.dataset.url, b.dataset.label)) ev.preventDefault(); return; }
   if (a === 'closeplayer'){ closePlayer(); return; }
   if (a === 'mute' || a === 'mute-set'){ toggleMute(); return; }
+  if (a === 'calprev' || a === 'calnext'){ calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() + (a === 'calnext' ? 1 : -1), 1, 12); calSel = null; render(); return; }
+  if (a === 'calday'){ calSel = b.dataset.k; const y = window.scrollY; render(); window.scrollTo(0, y); return; }
   if (a === 'login'){ doLogin(); return; }
   if (a === 'lgmode'){ loginMode = b.dataset.m; loginErr = ''; if (loginMode !== 'reset') loginMsg = ''; render(); const f = $('#lg-' + (loginMode === 'up' ? 'name' : 'email')); if (f) f.focus(); return; }
   if (a === 'install'){ doInstall(); return; }
