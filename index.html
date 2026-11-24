@@ -201,6 +201,22 @@ h2{font-size:1.6rem}
 .video .pb{width:52px;height:52px;border-radius:50%;background:var(--pc,var(--accent));color:var(--pf,#fff);display:grid;place-items:center;flex:none}
 .video .pb svg{width:22px;height:22px;margin-left:3px}
 .video b{display:block;font-size:1.05rem;font-weight:800}
+.tpl-list{display:flex;flex-direction:column;gap:10px}
+.tpl{border:0;background:var(--surface);box-shadow:var(--shadow);border-radius:var(--r);padding:16px;text-align:left;display:flex;flex-direction:column;gap:8px;width:100%}
+.tpl-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.tpl-top b{font-family:var(--display);font-weight:800;font-size:1.5rem;text-transform:uppercase;line-height:1}
+.tpl-desc{color:var(--muted);font-size:.88rem;line-height:1.4}
+.tpl-days{display:flex;flex-wrap:wrap;gap:6px}
+.tpl-day{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:700;padding:3px 10px 3px 3px;border-radius:99px;background:var(--surface-2)}
+.tpl-day i{font-style:normal;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--pc);color:var(--pf);font-family:var(--display);font-weight:900;font-size:.72rem}
+.tpl-lvl{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.tpl-prev{border-radius:16px;background:var(--surface-2);padding:12px 14px;border-left:5px solid var(--pc)}
+.tpl-prev-h{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.tpl-prev-h small{display:block;color:var(--muted);font-size:.76rem;font-weight:600}
+.tpl-badge{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--pc);color:var(--pf);font-family:var(--display);font-weight:900;flex:none}
+.tpl-prev ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.tpl-prev li{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-top:1px solid var(--line);font-size:.9rem}
+.tpl-prev li b{font-variant-numeric:tabular-nums;white-space:nowrap}
 .guide{gap:0}
 .guide summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px}
 .guide summary::-webkit-details-marker{display:none}
@@ -574,6 +590,7 @@ function topbar(noAcct){
 function render(){
   renderNav();
   if (view === 'login') return renderLogin();
+  if (view === 'templates') return renderTemplates();
   if (view === 'edit') return renderEditor();
   if (view === 'body') return renderBody();
   if (view === 'prog') return renderProg();
@@ -584,7 +601,7 @@ function render(){
   if (!plan || !plan.days || !plan.days.length){
     app.innerHTML = `${topbar()}<section class="hero"><span class="eyebrow">Comece por aqui</span><h1>Monte seu plano</h1>
       <p class="focus" style="margin:0">Cadastre seus treinos (A, B, C…), escolha o dia da semana de cada um e adicione os exercícios. Todo dia o app abre direto no treino daquele dia.</p>
-      <div class="row"><button class="btn primary" data-act="new">Criar meu plano</button><button class="btn" data-act="example" style="background:var(--iron-2);border-color:var(--iron-line);color:var(--iron-fg)">Usar plano de exemplo</button><button class="btn" data-act="account" style="background:var(--iron-2);border-color:var(--iron-line);color:var(--iron-fg)">Restaurar backup</button></div></section>
+      <div class="row"><button class="btn primary" data-act="templates">Escolher um modelo pronto</button><button class="btn" data-act="new" style="background:var(--iron-2);border-color:var(--iron-line);color:var(--iron-fg)">Criar do zero</button><button class="btn" data-act="example" style="background:var(--iron-2);border-color:var(--iron-line);color:var(--iron-fg)">Usar plano de exemplo</button><button class="btn" data-act="account" style="background:var(--iron-2);border-color:var(--iron-line);color:var(--iron-fg)">Restaurar backup</button></div></section>
       ${slow ? '<p class="note">Ainda não deu para carregar seus dados. Confira a conexão.</p>' : ''}`;
     return;
   }
@@ -629,6 +646,7 @@ function render(){
     ${list}
     <div><div class="lbl">Fazer outro treino hoje</div><div class="chips" role="group" aria-label="Treinos">${chips}</div></div>
     ${guideCard()}
+    <button class="btn wide" data-act="templates">Trocar por um modelo pronto (ABC, ABCD, Full body…)</button>
     <div class="actions"><button class="btn" data-act="sched">Montar a semana</button><button class="btn" data-act="edit">Editar treinos</button></div>
     <div class="foot"><small>${mode==='db' ? 'Salvo na sua conta Google: abre igual no celular e no computador.' : mode==='local' ? (noCloud ? 'Salvo só neste aparelho. Configure o Firebase para sincronizar (veja o LEIA-ME).' : 'Salvo só neste aparelho.') : ''}</small></div>`;
   if (openId) renderSheet();
@@ -693,6 +711,7 @@ function renderEditor(){
   const p = draft;
   $('#app').innerHTML = `<div class="head"><span class="eyebrow">Editar plano</span><h1>Seus treinos</h1>
     <p class="muted" style="margin:0">Escolha o treino de cada dia da semana e monte os exercícios de cada treino. No campo de vídeo, cole um link do YouTube se quiser um vídeo específico. Sem link, o app abre a busca do exercício.</p></div>
+    <button class="btn wide" data-act="templates">Trocar tudo por um modelo pronto</button>
     <section class="sched" id="sched"></section>
     ${p.days.map((d,di) => `<section class="ed-day" style="${pcOf(d, p)}">
       <div class="row" style="flex-wrap:nowrap"><label class="field" style="flex:1"><span>Nome</span><input id="d${di}-label" data-d="${di}" data-f="label" value="${esc(d.label)}" placeholder="Treino A"></label>
@@ -1149,7 +1168,71 @@ function commitProfile(){
   if (p.height != null && p.height < 3) p.height = Math.round(p.height * 100); // digitou em metros
   profile = p; save('profile/me', profile); pdraft = null; view = 'body'; render(); window.scrollTo(0,0); toast('Perfil salvo');
 }
-function closeSheet(){ vidEdit = false; openId = null; openEntry = null; confirmMDel = false; $('#sheet').hidden = true; }
+function closeSheet(){ tplOpen = null; tplConfirm = false; vidEdit = false; openId = null; openEntry = null; confirmMDel = false; $('#sheet').hidden = true; }
+
+/* ---------- modelos de treino ---------- */
+let tplData = null, tplGoal = null, tplOpen = null, tplConfirm = false, tplErr = false;
+function goalFromProfile(){
+  const g = (profile && profile.goal || '').toLowerCase();
+  return /emagre|defini/.test(g) ? 'emagrecer' : /hipertro|força/.test(g) ? 'hipertrofia' : 'massa';
+}
+async function openTemplates(){
+  view = 'templates'; tplOpen = null; tplConfirm = false;
+  if (!tplGoal) tplGoal = goalFromProfile();
+  render(); window.scrollTo(0,0);
+  if (!tplData){
+    try { tplData = await (await fetch('templates.json', {cache:'no-cache'})).json(); tplErr = false; }
+    catch(e){ tplErr = true; }
+    if (view === 'templates') render();
+  }
+}
+function renderTemplates(){
+  const app = $('#app');
+  const goals = tplData ? tplData.goals : {emagrecer:'Emagrecer', massa:'Massa magra', hipertrofia:'Hipertrofia'};
+  const list = tplData ? tplData.templates.filter(t => t.goal === tplGoal) : [];
+  app.innerHTML = `${topbar(true)}
+    <div class="head"><button class="btn ghost" data-act="tplback" style="align-self:flex-start;padding-left:0">‹ Voltar</button>
+      <span class="eyebrow">Modelos prontos</span><h1>Escolha seu treino</h1>
+      <p class="muted" style="margin:0">Escolha o objetivo e depois a divisão. Todos os exercícios já vêm com séries, repetições, descanso e vídeos. Depois você pode editar o que quiser.</p></div>
+    <div class="chips" role="group" aria-label="Objetivo">${Object.entries(goals).map(([k, n]) =>
+      `<button class="chip" data-act="tplgoal" data-g="${k}" aria-pressed="${k === tplGoal}"><b>${esc(n)}</b></button>`).join('')}</div>
+    <p class="note">${esc({emagrecer:'Emagrecer: repetições altas, descanso curto e cardio de 30–40 min nos dias de treino.',
+      massa:'Massa magra: 8–12 repetições, descanso médio e cardio leve de 15–20 min. Ganha músculo sem acumular gordura.',
+      hipertrofia:'Hipertrofia: cargas mais pesadas (6–10 nos exercícios principais), descanso de 2 min e mais séries. Cardio opcional.'}[tplGoal] || '')}</p>
+    ${tplErr ? '<p class="note">Não deu para carregar os modelos. Confira a internet e tente de novo.</p>'
+      : !tplData ? '<p class="muted">Carregando modelos…</p>'
+      : `<div class="tpl-list">${list.map(t => `
+        <button class="tpl" data-act="tplopen" data-id="${esc(t.id)}">
+          <span class="tpl-top"><b>${esc(t.split)}</b><span class="pill">${t.perWeek}x por semana</span></span>
+          <span class="tpl-desc">${esc(t.desc)}</span>
+          <span class="tpl-days">${t.plan.days.map((d, i) => `<span class="tpl-day" style="${pcOf(d, t.plan)}"><i>${esc(badgeOf(d))}</i>${esc(d.focus)}</span>`).join('')}</span>
+          <span class="tpl-lvl">${esc(t.level)}</span>
+        </button>`).join('')}</div>`}
+    <div class="foot"><small>Usar um modelo troca o plano atual. Antes, se quiser guardar o atual, use Baixar backup no botão de conta.</small></div>`;
+  if (tplOpen) renderTplSheet();
+}
+function renderTplSheet(){
+  const t = tplData && tplData.templates.find(x => x.id === tplOpen), el = $('#sheet');
+  if (!t){ closeSheet(); return; }
+  const wd = d => (d.weekdays || []).slice().sort((a,b) => ((a+6)%7) - ((b+6)%7)).map(w => WD[w]).join(', ');
+  el.innerHTML = `<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="tp-t">
+    <div class="grab"></div>
+    <div class="sheet-top"><div style="min-width:0"><span class="eyebrow">${esc(t.goalName)} · ${t.perWeek}x por semana · ${esc(t.level)}</span><h2 id="tp-t" style="margin-top:6px">${esc(t.split)}</h2></div>
+      <button class="x" data-act="close" aria-label="Fechar">${icon.x}</button></div>
+    ${t.plan.days.map(d => `<div class="tpl-prev" style="${pcOf(d, t.plan)}">
+      <div class="tpl-prev-h"><span class="tpl-badge">${esc(badgeOf(d))}</span><span><b>${esc(d.label)} · ${esc(d.focus)}</b><small>${esc(wd(d))}</small></span></div>
+      <ul>${d.exercises.map(e => `<li><span>${esc(e.name)}</span><b>${e.sets} × ${esc(e.reps)}</b></li>`).join('')}</ul></div>`).join('')}
+    <div><div class="lbl">Dicas para esse objetivo</div><ul class="g-list">${(t.plan.guide.tips || []).map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>
+    <button class="btn primary wide" data-act="tpluse">${tplConfirm ? 'Toque de novo para trocar seu plano por este' : 'Usar este modelo'}</button>
+  </div>`;
+  el.hidden = false;
+}
+function applyTemplate(){
+  const t = tplData && tplData.templates.find(x => x.id === tplOpen); if (!t) return;
+  plan = clone(t.plan); savePlan(); loaded = true;
+  closeSheet(); tplOpen = null; tplConfirm = false; view = 'today'; viewDayId = null; viewWd = today.getDay();
+  render(); window.scrollTo(0,0); toast('Plano trocado: ' + t.split + ' · ' + t.goalName);
+}
 
 /* ---------- conta, login e backup ---------- */
 let account = null, noCloud = false, cloudRef = null;
@@ -1231,6 +1314,11 @@ document.addEventListener('click', ev => {
     render(); window.scrollTo(0,0); return;
   }
   if (a === 'login'){ doLogin(); return; }
+  if (a === 'templates'){ draft = null; openTemplates(); return; }
+  if (a === 'tplback'){ view = 'today'; render(); window.scrollTo(0,0); return; }
+  if (a === 'tplgoal'){ tplGoal = b.dataset.g; render(); return; }
+  if (a === 'tplopen'){ tplOpen = b.dataset.id; tplConfirm = false; renderTplSheet(); return; }
+  if (a === 'tpluse'){ if (tplConfirm) applyTemplate(); else { tplConfirm = true; renderTplSheet(); } return; }
   if (a === 'account'){ renderAccount(); return; }
   if (a === 'export'){ downloadBackup(); return; }
   if (a === 'logout'){ if (cloudRef) cloudRef.signOut().then(() => { try { localStorage.clear(); } catch(e){} location.reload(); }); return; }
