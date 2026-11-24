@@ -558,6 +558,12 @@ h1,h2,h3{font-weight:700;letter-spacing:.02em}
 .cal-det ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
 .cal-det li{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-top:1px solid var(--line);font-size:.86rem}
 .cal-det li em{font-style:normal;color:#9befff;white-space:nowrap;font-variant-numeric:tabular-nums}
+.meta-field{grid-column:1/-1}
+.meta-row{display:flex;align-items:center;gap:8px}
+.meta-row em{font-style:normal;color:var(--muted);font-size:.85rem;flex:none}
+.meta-row .unit{flex:1;min-width:0}
+.meta-hint{color:var(--muted);font-size:.76rem;line-height:1.4}
+.meta-prev{margin:4px 0 0;padding:9px 12px;border-radius:12px;background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.3);color:#bff6ff;font-size:.84rem;line-height:1.4}
 /* ajustes para a fonte técnica, que é mais larga */
 .hero h1{font-size:clamp(2.1rem,10vw,3rem);line-height:.95;overflow-wrap:normal}
 .big b{font-size:clamp(3.4rem,17vw,4.6rem)}
@@ -1179,7 +1185,7 @@ function renderBody(){
         ${SEX[profile.sex] ? `<div><small>Sexo</small><b>${SEX[profile.sex]}</b></div>` : ''}
         ${profile.goal ? `<div><small>Objetivo</small><b>${esc(profile.goal)}</b></div>` : ''}
         ${profile.activity ? `<div><small>Atividade</small><b>${esc(profile.activity)}</b></div>` : ''}
-        ${num(profile.target) ? `<div><small>Peso meta</small><b>${num(profile.targetMin) ? esc(fmt(num(profile.targetMin))) + '–' : ''}${esc(fmt(num(profile.target)))} kg</b></div>` : ''}
+        ${num(profile.target) ? `<div><small>Peso meta</small><b>${num(profile.targetMin) ? esc(fmt(num(profile.targetMin))) + ' a ' : ''}${esc(fmt(num(profile.target)))} kg</b></div>` : ''}
         ${profile.work ? `<div><small>Trabalho</small><b>${esc(profile.work)}</b></div>` : ''}
       </div></div>`
     : `<div class="card"><h2>Seu perfil</h2><p class="muted" style="margin:0">Com altura, data de nascimento e sexo, o app calcula IMC, relação cintura/altura, metabolismo estimado e % de gordura pelas dobras.</p><div><button class="btn" data-act="profile">Preencher perfil</button></div></div>`;
@@ -1225,7 +1231,7 @@ function renderBody(){
       <div class="big"><b>${fmt(wCur.weight)}</b><span>kg</span></div>
       <div class="hero-meta">${dv != null ? `<span>${Math.abs(dv) < 0.05 ? 'Igual à anterior' : (dv > 0 ? '▲ +' : '▼ ') + fmt(dv) + ' kg desde ' + esc(fmtDate(wPrev.date))}</span>` : '<span>Primeira pesagem</span>'}
       ${bmi ? `<span>IMC ${fmt(bmi)} · ${esc(bmiClass(bmi))}</span>` : ''}
-      ${toGo != null ? `<span>${inRange || Math.abs(toGo) < 0.05 ? 'Na meta' : 'Meta ' + (tMin ? fmt(tMin) + '–' : '') + fmt(tgt) + ' kg · ' + (toGo > 0 ? 'faltam ' + fmt(toGo) + ' kg' : fmt(Math.abs(toGo)) + ' kg abaixo')}</span>` : ''}</div></section>`;
+      ${toGo != null && tMin != null && (Math.abs(tMin - wCur.weight) < 0.6 || Math.abs(tgt - wCur.weight) < 0.6) ? '<span>Confira a meta no perfil: ela inclui o seu peso de hoje</span>' : toGo != null ? `<span>${inRange || Math.abs(toGo) < 0.05 ? 'Na meta' : 'Meta ' + (tMin ? fmt(tMin) + ' a ' : '') + fmt(tgt) + ' kg · ' + (toGo > 0 ? 'faltam ' + fmt(toGo) + ' kg' : 'faltam ' + fmt((tMin || tgt) - wCur.weight) + ' kg para subir')}</span>` : ''}</div></section>`;
   } else {
     bodyHero = `<section class="hero" style="--pc:var(--accent)"><span class="eyebrow">Meu corpo</span><h1>Evolução</h1>
       <p class="focus" style="margin:0">Peso, bioimpedância e medidas num só lugar, com gráfico de evolução.</p></section>`;
@@ -1553,17 +1559,39 @@ function renderProfile(){
       <label class="field"><span>Sexo</span><select id="p-sex" data-pf="sex"><option value="">—</option><option value="M"${p.sex==='M'?' selected':''}>Masculino</option><option value="F"${p.sex==='F'?' selected':''}>Feminino</option></select></label>
       <label class="field"><span>Objetivo</span><select id="p-goal" data-pf="goal">${opts(GOALS, p.goal)}</select></label>
       <label class="field"><span>Nível de atividade</span><select id="p-activity" data-pf="activity">${opts(ACT, p.activity)}</select></label>
-      <label class="field"><span>Peso meta: de</span><div class="unit"><input id="p-targetMin" data-pf="targetMin" inputmode="decimal" value="${esc(p.targetMin ?? '')}" placeholder="opcional"><i>kg</i></div></label>
-      <label class="field"><span>Peso meta: até</span><div class="unit"><input id="p-target" data-pf="target" inputmode="decimal" value="${esc(p.target ?? '')}"><i>kg</i></div></label>
+      <div class="field meta-field"><span>Peso meta (onde você quer chegar)</span>
+        <div class="meta-row"><em>entre</em><div class="unit"><input id="p-targetMin" data-pf="targetMin" inputmode="decimal" value="${esc(p.targetMin ?? p.target ?? '')}" placeholder="78" aria-label="Peso meta, menor valor"><i>kg</i></div>
+          <em>e</em><div class="unit"><input id="p-target" data-pf="target" inputmode="decimal" value="${esc(p.targetMin != null ? (p.target ?? '') : '')}" placeholder="82" aria-label="Peso meta, maior valor (opcional)"><i>kg</i></div></div>
+        <small class="meta-hint">Se a sua meta for um número só (ex.: 80 kg), preencha só o primeiro campo. Não coloque aqui o seu peso de hoje: ele vem das medições.</small>
+        <p class="meta-prev" id="meta-prev">${esc(metaPreview(p))}</p>
+      </div>
     </div></div>
     <div class="savebar"><button class="btn" data-act="cancelpf">Cancelar</button><button class="btn primary" data-act="savepf">Salvar perfil</button></div>`;
+}
+function currentWeight(){ const w = measures.filter(e => e.weight != null); return w.length ? w[w.length-1].weight : null; }
+function metaRange(lo, hi){
+  lo = num(lo); hi = num(hi);
+  if (lo == null && hi == null) return {min:null, max:null};
+  if (lo == null || hi == null || Math.abs(lo - hi) < 0.05) return {min:null, max: lo ?? hi};
+  return {min: Math.min(lo, hi), max: Math.max(lo, hi)};
+}
+function metaPreview(d){
+  const r = metaRange(d.targetMin, d.target), w = currentWeight();
+  if (r.max == null) return w != null ? `Seu peso atual é ${fmt(w)} kg. Preencha a meta acima.` : 'Preencha a meta acima.';
+  const txt = r.min != null ? `Meta: entre ${fmt(r.min)} e ${fmt(r.max)} kg` : `Meta: ${fmt(r.max)} kg`;
+  if (w == null) return txt + '.';
+  const lo = r.min ?? r.max;
+  if (r.min != null && (Math.abs(r.min - w) < 0.6 || Math.abs(r.max - w) < 0.6))
+    return `Atenção: ${fmt(w)} kg é o seu peso de hoje. Aqui vai só onde você quer chegar (ex.: entre 78 e 82, ou só 80).`;
+  if (w > r.max + 0.05) return `${txt}. Hoje você está com ${fmt(w)} kg: faltam ${fmt(w - r.max)} kg para chegar.`;
+  if (w < lo - 0.05) return `${txt}. Hoje você está com ${fmt(w)} kg: faltam ${fmt(lo - w)} kg para subir até a meta.`;
+  return `${txt}. Hoje você está com ${fmt(w)} kg: já está dentro da meta!`;
 }
 function commitProfile(){
   const p = {sex: SEX[pdraft.sex] ? pdraft.sex : '', birth: /^\d{4}-\d{2}-\d{2}$/.test(pdraft.birth || '') ? pdraft.birth : '',
     height: num(pdraft.height), target: num(pdraft.target), targetMin: num(pdraft.targetMin), age: num(pdraft.age),
     goal: pdraft.goal || '', activity: pdraft.activity || '', work: pdraft.work || ''};
-  if (p.targetMin != null && p.target == null){ p.target = p.targetMin; p.targetMin = null; }
-  if (p.targetMin != null && p.targetMin > p.target){ const t = p.target; p.target = p.targetMin; p.targetMin = t; }
+  const r = metaRange(pdraft.targetMin, pdraft.target); p.target = r.max; p.targetMin = r.min;
   if (p.height != null && p.height < 3) p.height = Math.round(p.height * 100); // digitou em metros
   profile = p; save('profile/me', profile); pdraft = null; view = 'body'; render(); window.scrollTo(0,0); toast('Perfil salvo');
 }
@@ -1849,7 +1877,7 @@ document.addEventListener('click', ev => {
   if (a === 'savem'){ commitBForm(); return; }
   if (a === 'cancelm'){ bdraft = null; view = 'body'; render(); window.scrollTo(0,0); return; }
   if (a === 'metric'){ metric = b.dataset.k; render(); return; }
-  if (a === 'profile'){ pdraft = clone(profile || {}); view = 'profile'; render(); window.scrollTo(0,0); return; }
+  if (a === 'profile'){ pdraft = clone(profile || {}); { const r = metaRange(pdraft.targetMin, pdraft.target); pdraft.targetMin = r.min ?? r.max; pdraft.target = r.min != null ? r.max : null; } view = 'profile'; render(); window.scrollTo(0,0); return; }
   if (a === 'savepf'){ commitProfile(); return; }
   if (a === 'cancelpf'){ pdraft = null; view = 'body'; render(); return; }
   if (a === 'day'){ viewDayId = viewDayId === id ? null : id; render(); }
@@ -1916,7 +1944,7 @@ document.addEventListener('input', ev => {
   if (bdraft && t.dataset.m){ bdraft[t.dataset.m] = t.value; return; }
   if (vdraft && t.dataset.vl != null){ vdraft[+t.dataset.vl].label = t.value; return; }
   if (vdraft && t.dataset.vu != null){ vdraft[+t.dataset.vu].url = t.value; return; }
-  if (pdraft && t.dataset.pf){ pdraft[t.dataset.pf] = t.value; return; }
+  if (pdraft && t.dataset.pf){ pdraft[t.dataset.pf] = t.value; if (/^target/.test(t.dataset.pf)){ const m = $('#meta-prev'); if (m) m.textContent = metaPreview(pdraft); } return; }
   if (!draft || t.dataset.f == null) return;
   const d = draft.days[+t.dataset.d];
   const target = t.dataset.e != null ? d.exercises[+t.dataset.e] : d;
