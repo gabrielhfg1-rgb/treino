@@ -479,6 +479,21 @@ h1,h2,h3{font-weight:700;letter-spacing:.02em}
 .lg-google{background:#fff;color:#1f2330;border:0}
 .lg-google svg{color:#1f2330}
 .lg-foot{margin:0;text-align:center;color:var(--muted);font-size:.8rem}
+/* player de vídeo */
+.player{position:fixed;inset:0;z-index:60;background:rgba(2,3,10,.88);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;
+  padding:calc(12px + env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px));animation:fadein .18s ease-out}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.pl-box{width:100%;max-width:820px;display:flex;flex-direction:column;gap:12px}
+.pl-box.vert{max-width:min(420px,calc((100vh - 170px) * 9 / 16))}
+.pl-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.pl-title{display:flex;flex-direction:column;gap:4px;min-width:0}
+.pl-title b{font-family:var(--display);font-size:1.15rem;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl-frame{position:relative;width:100%;aspect-ratio:16/9;border-radius:18px;overflow:hidden;background:#000;
+  border:1px solid rgba(34,211,238,.35);box-shadow:0 0 0 1px rgba(139,92,246,.2),0 0 40px rgba(34,211,238,.25),0 30px 80px -20px rgba(0,0,0,.9)}
+.pl-box.vert .pl-frame{aspect-ratio:9/16}
+.pl-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.pl-ext{align-self:center;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){.player{animation:none}}
 /* ajustes para a fonte técnica, que é mais larga */
 .hero h1{font-size:clamp(2.1rem,10vw,3rem);line-height:.95;overflow-wrap:normal}
 .big b{font-size:clamp(3.4rem,17vw,4.6rem)}
@@ -496,6 +511,7 @@ h1,h2,h3{font-weight:700;letter-spacing:.02em}
 <div class="wrap" id="app"></div>
 <div class="scrim" id="sheet" hidden></div>
 <div class="toast" id="toast" hidden></div>
+<div class="player" id="player" hidden></div>
 <nav class="nav" id="nav" aria-label="Navegação"></nav>
 
 <script>
@@ -704,14 +720,51 @@ function videoBlock(ex){
       <button class="btn ghost" data-act="editvid" style="align-self:flex-start;margin-top:-8px">+ Salvar vídeos deste exercício</button>`;
   }
   const [first, ...rest] = list;
-  const sub = v => [srcOf(v.url) === 'YouTube' ? 'Abre direto o vídeo' : 'Abre no ' + srcOf(v.url), fmtDur(v.dur)].filter(Boolean).join(' · ');
+  const sub = v => [embedOf(v.url) ? 'Toca aqui no app' : 'Abre no ' + srcOf(v.url), fmtDur(v.dur)].filter(Boolean).join(' · ');
   return `<div class="vids">
-    <a class="video" href="${esc(first.url)}" target="_blank" rel="noopener"><span class="pb">${PLAY}</span><span><b>${esc(first.label || 'Ver vídeo de execução')}</b><small>${esc(sub(first))}</small></span></a>
+    <a class="video" href="${esc(first.url)}" target="_blank" rel="noopener" data-act="play" data-url="${esc(first.url)}" data-label="${esc(first.label || ex.name)}"><span class="pb">${PLAY}</span><span><b>${esc(first.label || 'Ver vídeo de execução')}</b><small>${esc(sub(first))}</small></span></a>
     ${rest.length ? `<div class="lbl" style="margin:4px 0 0">Sem esse equipamento? Outras versões</div>
-      ${rest.map(v => `<a class="vid-alt" href="${esc(v.url)}" target="_blank" rel="noopener"><span class="pb">${PLAY}</span><span><b>${esc(v.label || 'Outra versão')}</b><small>${esc([srcOf(v.url) === 'YouTube' ? '' : srcOf(v.url), fmtDur(v.dur)].filter(Boolean).join(' · ') || 'Abre o vídeo')}</small></span></a>`).join('')}` : ''}
+      ${rest.map(v => `<a class="vid-alt" href="${esc(v.url)}" target="_blank" rel="noopener" data-act="play" data-url="${esc(v.url)}" data-label="${esc(v.label || ex.name)}"><span class="pb">${PLAY}</span><span><b>${esc(v.label || 'Outra versão')}</b><small>${esc([srcOf(v.url) === 'YouTube' ? '' : srcOf(v.url), fmtDur(v.dur)].filter(Boolean).join(' · ') || 'Abre o vídeo')}</small></span></a>`).join('')}` : ''}
   </div>
   <button class="btn ghost" data-act="editvid" style="align-self:flex-start;margin-top:-8px">Editar vídeos</button>`;
 }
+
+/* ---------- player de vídeo dentro do app ---------- */
+function embedOf(url){
+  url = String(url || '');
+  let m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|live\/))([\w-]{6,20})/i);
+  if (m){
+    const t = url.match(/[?&]t=(\d+)/);
+    return {src:'https://www.youtube-nocookie.com/embed/' + m[1] + '?autoplay=1&playsinline=1&rel=0&modestbranding=1' + (t ? '&start=' + t[1] : ''), kind:'YouTube', id:m[1]};
+  }
+  m = url.match(/instagram\.com\/(?:[\w.]+\/)?(reels?|p|tv)\/([\w-]+)/i);
+  if (m) return {src:'https://www.instagram.com/' + (m[1].toLowerCase() === 'p' ? 'p' : 'reel') + '/' + m[2] + '/embed/', kind:'Instagram', vertical:true};
+  m = url.match(/tiktok\.com\/@[\w.-]+\/video\/(\d+)/i);
+  if (m) return {src:'https://www.tiktok.com/embed/v2/' + m[1], kind:'TikTok', vertical:true};
+  return null;
+}
+function openPlayer(url, label){
+  const e = embedOf(url);
+  if (!e) return false;
+  const vertical = e.vertical || /shorts\//i.test(url) || /skeletmotion/i.test(label || '');
+  const el = $('#player');
+  el.innerHTML = `<div class="pl-box${vertical ? ' vert' : ''}" role="dialog" aria-modal="true" aria-label="${esc(label || 'Vídeo')}">
+    <div class="pl-top"><span class="pl-title"><span class="eyebrow">Vídeo · ${esc(e.kind)}</span><b>${esc(label || '')}</b></span>
+      <button class="x" data-act="closeplayer" aria-label="Fechar vídeo">${icon.x}</button></div>
+    <div class="pl-frame"><iframe src="${esc(e.src)}" title="${esc(label || 'Vídeo do exercício')}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+    <a class="btn ghost pl-ext" href="${esc(url)}" target="_blank" rel="noopener">Não carregou? Abrir no ${esc(e.kind)} ↗</a>
+  </div>`;
+  el.hidden = false;
+  try { history.pushState({player:true}, ''); } catch(err){}
+  return true;
+}
+function closePlayer(fromBack){
+  const el = $('#player'); if (el.hidden) return;
+  el.innerHTML = ''; el.hidden = true;
+  if (!fromBack){ try { if (history.state && history.state.player) history.back(); } catch(err){} }
+}
+window.addEventListener('popstate', () => closePlayer(true));
+
 function toast(msg){ const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 3200); }
 
 /* ---------- tela de hoje ---------- */
@@ -1588,13 +1641,15 @@ async function applyBackup(obj){
 /* ---------- eventos ---------- */
 document.addEventListener('click', ev => {
   const b = ev.target.closest('[data-act]');
-  if (!b){ if (ev.target.id === 'sheet') closeSheet(); return; }
+  if (!b){ if (ev.target.id === 'sheet') closeSheet(); if (ev.target.id === 'player') closePlayer(); return; }
   const a = b.dataset.act, id = b.dataset.id, di = +b.dataset.d, ei = +b.dataset.e;
   if (a === 'tab'){
     closeSheet(); view = b.dataset.v; viewDayId = null;
     try { location.hash = view === 'body' ? 'corpo' : view === 'prog' ? 'progresso' : 'treino'; } catch(e){}
     render(); window.scrollTo(0,0); return;
   }
+  if (a === 'play'){ if (openPlayer(b.dataset.url, b.dataset.label)) ev.preventDefault(); return; }
+  if (a === 'closeplayer'){ closePlayer(); return; }
   if (a === 'login'){ doLogin(); return; }
   if (a === 'lgmode'){ loginMode = b.dataset.m; loginErr = ''; if (loginMode !== 'reset') loginMsg = ''; render(); const f = $('#lg-' + (loginMode === 'up' ? 'name' : 'email')); if (f) f.focus(); return; }
   if (a === 'install'){ doInstall(); return; }
@@ -1704,7 +1759,7 @@ document.addEventListener('change', ev => {
   else if (bdraft && t.dataset.m) bdraft[t.dataset.m] = t.value;
 });
 document.addEventListener('submit', ev => { if (ev.target.id === 'login-form'){ ev.preventDefault(); doEmailAuth(); } });
-document.addEventListener('keydown', ev => { if (ev.key === 'Escape' && (openId || openEntry)) closeSheet(); });
+document.addEventListener('keydown', ev => { if (ev.key === 'Escape' && !$('#player').hidden){ closePlayer(); return; } if (ev.key === 'Escape' && (openId || openEntry)) closeSheet(); });
 
 init();
 </script>
