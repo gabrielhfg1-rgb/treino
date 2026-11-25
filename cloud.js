@@ -80,6 +80,27 @@ async function start() {
       auth.languageCode = 'pt-BR';
       await A.sendPasswordResetEmail(auth, email);
     },
+    // formas de login da conta atual: 'password' e/ou 'google.com'
+    providers() {
+      const u = auth.currentUser;
+      return u ? u.providerData.map(x => x.providerId) : [];
+    },
+    // troca a senha (pede a senha atual para confirmar que é você)
+    async changePassword(current, next) {
+      const u = auth.currentUser;
+      if (!u || !u.email) throw { code: 'auth/no-user' };
+      await A.reauthenticateWithCredential(u, A.EmailAuthProvider.credential(u.email, current));
+      await A.updatePassword(u, next);
+    },
+    // conta criada com o Google: confirma pelo Google e cria uma senha para entrar com e-mail
+    async addPassword(next) {
+      const u = auth.currentUser;
+      if (!u || !u.email) throw { code: 'auth/no-user' };
+      const provider = new A.GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account', login_hint: u.email });
+      await A.reauthenticateWithPopup(u, provider);
+      await A.linkWithCredential(u, A.EmailAuthProvider.credential(u.email, next));
+    },
     signOut: () => A.signOut(auth),
   };
 }

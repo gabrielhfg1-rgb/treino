@@ -671,6 +671,10 @@ h1,h2,h3{font-weight:700;letter-spacing:.02em}
 .ed-body{display:flex;flex-direction:column;gap:10px;padding:0 12px 12px;border-top:1px solid var(--line);padding-top:12px}
 .ed-tools{display:flex;align-items:center;gap:6px}
 .ed-tools .btn svg{width:15px;height:15px}
+/* alterar senha */
+.pw-box{display:flex;flex-direction:column;gap:10px}
+.pw-box.open > .vid-alt{border-color:rgba(34,211,238,.45)}
+.pw-box .lg-form{padding:12px;border-radius:14px;border:1px solid var(--line);background:rgba(5,7,18,.5)}
 /* ajustes para a fonte técnica, que é mais larga */
 .hero h1{font-size:clamp(2.1rem,10vw,3rem);line-height:.95;overflow-wrap:normal}
 .big b{font-size:clamp(3.4rem,17vw,4.6rem)}
@@ -728,6 +732,7 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt
 const clone = o => JSON.parse(JSON.stringify(o));
 const uid = () => Math.random().toString(36).slice(2, 9);
 const icon = {
+  lock:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.2" fill="currentColor" stroke="none"/></svg>',
   check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
   play:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M10 8.5v7l6-3.5z" fill="currentColor" stroke="none"/></svg>',
   x:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
@@ -2175,9 +2180,62 @@ function renderAccount(){
       <button class="vid-alt" data-act="mute-set" style="border:0;text-align:left;width:100%"><span class="pb">${isMuted() ? icon.muted : icon.sound}</span><span><b>Som dos vídeos: ${isMuted() ? 'desligado' : 'ligado'}</b><small>${isMuted() ? 'Toque para ligar o som em todos os vídeos' : 'Toque para tocar todos os vídeos sem som'}</small></span></button>
       ${isStandalone() ? '' : `<button class="vid-alt" data-act="install" style="border:0;text-align:left;width:100%"><span class="pb">${icon.down}</span><span><b>Instalar o app</b><small>Ícone na tela inicial, abre como aplicativo</small></span></button>`}
     </div>
+    ${account && cloudRef && cloudRef.providers ? pwBlock() : ''}
     ${account ? '<button class="btn danger" data-act="logout">Sair da conta</button>' : ''}
   </div>`;
   el.hidden = false;
+}
+/* ---------- alterar senha ---------- */
+const pw = {open:false, cur:'', n1:'', n2:'', err:'', msg:'', busy:false};
+function pwHasPass(){ try { return cloudRef.providers().includes('password'); } catch(e){ return false; } }
+function pwBlock(){
+  const has = pwHasPass();
+  const f = (key, label, ac, ph) => `<label class="lg-field"><span>${label}</span><input id="pw-${key}" data-pw="${key}" type="password" value="${esc(pw[key])}" autocomplete="${ac}" placeholder="${ph}" required></label>`;
+  return `<div class="pw-box${pw.open ? ' open' : ''}">
+    <button class="vid-alt" data-act="pwtoggle" aria-expanded="${pw.open}" style="border:0;text-align:left;width:100%"><span class="pb">${icon.lock}</span><span><b>${has ? 'Alterar senha' : 'Criar senha de acesso'}</b><small>${has ? 'Troque a senha que você usa para entrar' : 'Você entra com o Google; crie uma senha para entrar também com e-mail'}</small></span></button>
+    ${pw.msg ? `<p class="lg-msg ok" role="status">${esc(pw.msg)}</p>` : ''}
+    ${pw.open ? `<form id="pw-form" class="lg-form" novalidate>
+      <input type="email" autocomplete="username" value="${esc(account.email)}" hidden readonly>
+      ${has ? f('cur', 'Senha atual', 'current-password', 'Sua senha de agora') : `<p class="muted" style="margin:0;font-size:.86rem">Ao salvar, o Google vai pedir para confirmar que é você.</p>`}
+      ${f('n1', 'Nova senha', 'new-password', 'Mínimo de 6 caracteres')}
+      ${f('n2', 'Repita a nova senha', 'new-password', 'Digite de novo')}
+      ${pw.err ? `<p class="lg-msg err" role="alert">${esc(pw.err)}</p>` : ''}
+      <button class="btn primary" type="submit" ${pw.busy ? 'disabled' : ''}>${pw.busy ? 'Salvando…' : has ? 'Salvar nova senha' : 'Criar senha'}</button>
+      ${has ? `<button class="btn ghost" type="button" data-act="pwforgot" style="align-self:flex-start;padding-left:0">Esqueci a senha atual</button>` : ''}
+    </form>` : ''}
+  </div>`;
+}
+function pwReset(){ Object.assign(pw, {open:false, cur:'', n1:'', n2:'', err:'', msg:'', busy:false}); }
+function pwFocus(){ const i = $('#pw-cur') || $('#pw-n1'); if (i) i.focus(); }
+async function doChangePassword(){
+  const has = pwHasPass();
+  pw.err = ''; pw.msg = '';
+  if (has && !pw.cur){ pw.err = 'Digite a sua senha atual.'; renderAccount(); pwFocus(); return; }
+  if (pw.n1.length < 6){ pw.err = 'A nova senha precisa ter pelo menos 6 caracteres.'; renderAccount(); return; }
+  if (pw.n1 !== pw.n2){ pw.err = 'As duas senhas novas não são iguais.'; pw.n2 = ''; renderAccount(); return; }
+  if (has && pw.n1 === pw.cur){ pw.err = 'A nova senha é igual à atual. Escolha outra.'; renderAccount(); return; }
+  pw.busy = true; renderAccount();
+  try {
+    if (has) await cloudRef.changePassword(pw.cur, pw.n1);
+    else await cloudRef.addPassword(pw.n1);
+    pwReset();
+    pw.msg = has ? 'Senha alterada! Use a nova senha da próxima vez que entrar.' : 'Senha criada! Agora você também pode entrar com ' + account.email + ' e essa senha.';
+  } catch(e){
+    const c = (e && e.code) || '';
+    pw.busy = false; pw.cur = ''; pw.n2 = '';
+    pw.err = /invalid-credential|wrong-password|invalid-login/.test(c) ? 'A senha atual está incorreta.'
+      : c.includes('provider-already-linked') || c.includes('credential-already-in-use') ? 'Esta conta já tem senha. Feche e abra de novo para alterar.'
+      : c.includes('user-mismatch') ? 'Escolha no Google a mesma conta que está usando aqui (' + account.email + ').'
+      : c.includes('requires-recent-login') ? 'Por segurança, saia da conta, entre de novo e tente outra vez.'
+      : authMsg(e);
+  }
+  renderAccount();
+}
+async function doPwForgot(){
+  pw.err = ''; pw.msg = '';
+  try { await cloudRef.resetPassword(account.email); pwReset(); pw.msg = 'Enviamos um link para ' + account.email + '. Abra o e-mail (confira o spam) e crie a senha nova.'; }
+  catch(e){ pw.err = authMsg(e); }
+  renderAccount();
 }
 function backupData(){
   return {app:'treino-do-dia', version:1, exportedAt:new Date().toISOString(), plan, profile, measures, logs:trainLog, water:waterLog};
@@ -2253,7 +2311,9 @@ document.addEventListener('click', ev => {
   if (a === 'tplgoal'){ tplGoal = b.dataset.g; render(); return; }
   if (a === 'tplopen'){ tplOpen = b.dataset.id; tplConfirm = false; renderTplSheet(); return; }
   if (a === 'tpluse'){ if (tplConfirm) applyTemplate(); else { tplConfirm = true; renderTplSheet(); } return; }
-  if (a === 'account'){ renderAccount(); return; }
+  if (a === 'account'){ pwReset(); renderAccount(); return; }
+  if (a === 'pwtoggle'){ const o = !pw.open; pwReset(); pw.open = o; renderAccount(); if (o) pwFocus(); return; }
+  if (a === 'pwforgot'){ doPwForgot(); return; }
   if (a === 'export'){ downloadBackup(); return; }
   if (a === 'logout'){ if (cloudRef) cloudRef.signOut().then(() => { try { localStorage.clear(); } catch(e){} location.reload(); }); return; }
   if (a === 'newm'){ bdraft = {id:uid(), date:logKey}; view = 'bform'; render(); window.scrollTo(0,0); return; }
@@ -2327,6 +2387,7 @@ document.addEventListener('input', ev => {
   const t = ev.target;
   if (t.id === 'sh-load'){ const ex = findEx(openId); if (ex){ ex.load = t.value; savePlan(); if ((log.sets[ex.id] || 0) > 0) saveLog(); } return; }
   if (t.id === 'ed-q'){ edQuery = t.value; applyEdFilter(); return; }
+  if (t.dataset.pw){ pw[t.dataset.pw] = t.value; return; }
   if (t.dataset.lg){ lg[t.dataset.lg] = t.value; return; }
   if (bdraft && t.dataset.m){ bdraft[t.dataset.m] = t.value; return; }
   if (vdraft && t.dataset.vl != null){ vdraft[+t.dataset.vl].label = t.value; return; }
@@ -2353,7 +2414,8 @@ document.addEventListener('change', ev => {
   else if (pdraft && t.dataset.pf) pdraft[t.dataset.pf] = t.value;
   else if (bdraft && t.dataset.m) bdraft[t.dataset.m] = t.value;
 });
-document.addEventListener('submit', ev => { if (ev.target.id === 'login-form'){ ev.preventDefault(); doEmailAuth(); } });
+document.addEventListener('submit', ev => { if (ev.target.id === 'login-form'){ ev.preventDefault(); doEmailAuth(); }
+  if (ev.target.id === 'pw-form'){ ev.preventDefault(); if (!pw.busy) doChangePassword(); } });
 document.addEventListener('keydown', ev => { if (ev.key === 'Escape' && !$('#player').hidden){ closePlayer(); return; } if (ev.key === 'Escape' && (openId || openEntry)) closeSheet(); });
 
 init();
