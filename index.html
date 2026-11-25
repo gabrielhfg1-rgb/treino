@@ -642,6 +642,35 @@ h1,h2,h3{font-weight:700;letter-spacing:.02em}
 .tag.g-emagrecer{color:#ffc2d3;border-color:rgba(255,92,138,.4);background:rgba(255,92,138,.1)}
 .tag.g-massa{color:#9befff;border-color:rgba(34,211,238,.4);background:rgba(34,211,238,.1)}
 .tag.g-hipertrofia{color:#d8c7ff;border-color:rgba(139,92,246,.45);background:rgba(139,92,246,.12)}
+/* editor com filtros */
+.sched-wrap{gap:0;padding:14px 16px}
+.sched-wrap summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.sched-wrap summary::-webkit-details-marker{display:none}
+.sched-wrap summary > span:first-child{display:flex;flex-direction:column;gap:4px}
+.sched-wrap summary b{font-family:var(--display);font-size:1.15rem}
+.sched-wrap .chev,.ed-row .chev{font-size:1.4rem;color:var(--muted);transition:transform .2s}
+.sched-wrap[open] .chev{transform:rotate(90deg)}
+.sched-wrap .sched{background:none;border:0;box-shadow:none;padding:12px 0 0;-webkit-backdrop-filter:none;backdrop-filter:none}
+.ed-filter{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;display:flex;flex-direction:column;gap:8px;padding:10px 0 8px;margin:-4px 0;background:linear-gradient(180deg,#05060d 75%,rgba(5,6,13,0))}
+.ed-chip{padding:8px 12px 8px 8px}
+.ed-chip[data-v="all"]{padding:8px 14px}
+.ed-chip small{font-size:.68rem}
+.ed-search{display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:14px;border:1px solid var(--line);background:rgba(5,7,18,.7)}
+.ed-search span{color:#7fe6f7;font-size:1.2rem}
+.ed-search input{flex:1;min-width:0;border:0;background:none;color:var(--fg);padding:11px 0;font:inherit;outline:none}
+.ed-day-h{display:flex;align-items:flex-end;gap:10px}
+.ed-list{display:flex;flex-direction:column;gap:8px}
+.ed-ex{border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.035);padding:0;overflow:hidden}
+.ed-ex.open{border-color:color-mix(in srgb,var(--pc,#22d3ee) 55%,transparent);box-shadow:0 0 18px color-mix(in srgb,var(--pc,#22d3ee) 18%,transparent)}
+.ed-row{display:flex;align-items:center;gap:10px;width:100%;padding:11px 12px;border:0;background:none;color:var(--fg);text-align:left;font:inherit}
+.ed-row .num{font-family:var(--display);font-weight:700;font-size:1.1rem;color:var(--muted);width:22px;flex:none;text-align:center}
+.ed-row-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.ed-row-name{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ed-row-sum{font-size:.78rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.ed-ex.open .ed-row .chev{transform:rotate(90deg);color:var(--pc,#22d3ee)}
+.ed-body{display:flex;flex-direction:column;gap:10px;padding:0 12px 12px;border-top:1px solid var(--line);padding-top:12px}
+.ed-tools{display:flex;align-items:center;gap:6px}
+.ed-tools .btn svg{width:15px;height:15px}
 /* ajustes para a fonte técnica, que é mais larga */
 .hero h1{font-size:clamp(2.1rem,10vw,3rem);line-height:.95;overflow-wrap:normal}
 .big b{font-size:clamp(3.4rem,17vw,4.6rem)}
@@ -978,6 +1007,7 @@ function renderNav(){
     <button data-act="tab" data-v="plan" ${view==='plan'?'aria-current="page"':''}>${icon.list}<span>Plano</span></button></div>`;
 }
 let guideOpen = false;
+document.addEventListener('toggle', e => { if (e.target.classList && e.target.classList.contains('sched-wrap')) edSchedOpen = e.target.open; }, true);
 document.addEventListener('toggle', e => { if (e.target.classList && e.target.classList.contains('guide')) guideOpen = e.target.open; }, true);
 function guideCard(){
   const g = plan && plan.guide; if (!g) return '';
@@ -1114,39 +1144,82 @@ function blankDay(n){ return {id:uid(), label:'Treino '+String.fromCharCode(65+n
 function openEditor(base){
   draft = clone(base || plan || {name:'Meu plano', days:[blankDay(0)]});
   delete draft.example;
-  view = 'edit'; confirmDel = null; render(); window.scrollTo(0,0);
+  view = 'edit'; confirmDel = null; edOpen = new Set(); edQuery = ''; edSchedOpen = false; if (edDay !== 'all') edDay = 0; render(); window.scrollTo(0,0);
+}
+let edDay = 0, edOpen = new Set(), edQuery = '', edSchedOpen = false;
+function edSummary(e){ return `${+e.sets || 0} × ${e.reps || '—'} · ${fmtRest(e.rest)}${e.load ? ' · ' + e.load : ''}`; }
+function edExercise(d, di, e, ei){
+  const open = edOpen.has(e.id);
+  return `<div class="ed-ex${open ? ' open' : ''}" data-exid="${esc(e.id)}" data-name="${esc((e.name || '').toLowerCase())}">
+    <button class="ed-row" data-act="edtoggle" data-id="${esc(e.id)}" aria-expanded="${open}">
+      <span class="num">${ei+1}</span>
+      <span class="ed-row-t"><b class="ed-row-name">${esc(e.name) || 'Novo exercício'}</b><small class="ed-row-sum">${esc(edSummary(e))}${(e.videos||[]).length ? ' · ' + e.videos.length + ' vídeo' + (e.videos.length > 1 ? 's' : '') : ''}</small></span>
+      <span class="chev" aria-hidden="true">›</span></button>
+    ${open ? `<div class="ed-body">
+      <label class="field"><span>Exercício</span><input id="d${di}e${ei}-name" data-d="${di}" data-e="${ei}" data-f="name" value="${esc(e.name)}" placeholder="Ex.: Supino reto"></label>
+      <div class="grid4">
+        <label class="field"><span>Séries</span><input id="d${di}e${ei}-sets" data-d="${di}" data-e="${ei}" data-f="sets" data-num="1" inputmode="numeric" value="${esc(e.sets)}"></label>
+        <label class="field"><span>Reps</span><input id="d${di}e${ei}-reps" data-d="${di}" data-e="${ei}" data-f="reps" value="${esc(e.reps)}" placeholder="10 ou 8-12"></label>
+        <label class="field"><span>Descanso (s)</span><input id="d${di}e${ei}-rest" data-d="${di}" data-e="${ei}" data-f="rest" data-num="1" inputmode="numeric" value="${esc(e.rest)}"></label>
+        <label class="field"><span>Carga</span><input id="d${di}e${ei}-load" data-d="${di}" data-e="${ei}" data-f="load" value="${esc(e.load)}" placeholder="20 kg"></label>
+      </div>
+      <label class="field"><span>Vídeo principal (opcional)${(e.videos||[]).length > 1 ? ' · +' + (e.videos.length - 1) + ' versões' : ''}</span><input id="d${di}e${ei}-video" data-d="${di}" data-e="${ei}" data-f="video" value="${esc(e.video)}" placeholder="https://youtube.com/..." inputmode="url"></label>
+      <label class="field"><span>Dicas de execução (opcional)</span><textarea id="d${di}e${ei}-notes" data-d="${di}" data-e="${ei}" data-f="notes">${esc(e.notes)}</textarea></label>
+      <div class="ed-tools">
+        <button class="mini" data-act="mv" data-d="${di}" data-e="${ei}" data-dir="-1" ${ei===0?'disabled':''} aria-label="Subir">${icon.up}</button>
+        <button class="mini" data-act="mv" data-d="${di}" data-e="${ei}" data-dir="1" ${ei===d.exercises.length-1?'disabled':''} aria-label="Descer">${icon.down}</button>
+        <span style="flex:1"></span>
+        <button class="btn ghost danger" data-act="rmex" data-d="${di}" data-e="${ei}" style="padding:6px 8px">${icon.trash} Remover</button>
+      </div>
+    </div>` : ''}
+  </div>`;
+}
+function edDaySection(d, di, p){
+  return `<section class="ed-day" style="${pcOf(d, p)}" data-day="${di}">
+    <div class="ed-day-h"><span class="tm-badge" style="width:36px;height:36px">${esc(badgeOf(d))}</span>
+      <div class="row" style="flex-wrap:nowrap;flex:1;min-width:0"><label class="field" style="flex:1"><span>Nome</span><input id="d${di}-label" data-d="${di}" data-f="label" value="${esc(d.label)}" placeholder="Treino A"></label>
+      <label class="field" style="flex:1.6"><span>Foco</span><input id="d${di}-focus" data-d="${di}" data-f="focus" value="${esc(d.focus)}" placeholder="Peito e tríceps"></label></div></div>
+    <div class="ed-list">${d.exercises.map((e, ei) => edExercise(d, di, e, ei)).join('')}</div>
+    <p class="muted ed-none" hidden style="margin:0;font-size:.86rem">Nenhum exercício com esse nome neste treino.</p>
+    <div class="row" style="justify-content:space-between"><button class="btn ghost" data-act="addex" data-d="${di}">+ Adicionar exercício</button>
+    <button class="btn ghost danger" data-act="rmday" data-d="${di}">${confirmDel===di ? 'Toque de novo para remover' : 'Remover treino'}</button></div>
+  </section>`;
 }
 function renderEditor(){
   const p = draft;
-  $('#app').innerHTML = `<div class="head"><span class="eyebrow">Editar plano</span><h1>Seus treinos</h1>
-    <p class="muted" style="margin:0">Escolha o treino de cada dia da semana e monte os exercícios de cada treino. No campo de vídeo, cole um link do YouTube se quiser um vídeo específico. Sem link, o app abre a busca do exercício.</p></div>
-    <button class="btn wide" data-act="templates">Trocar tudo por um modelo pronto (com filtros)</button>
-    <section class="sched" id="sched"></section>
-    ${p.days.map((d,di) => `<section class="ed-day" style="${pcOf(d, p)}">
-      <div class="row" style="flex-wrap:nowrap"><label class="field" style="flex:1"><span>Nome</span><input id="d${di}-label" data-d="${di}" data-f="label" value="${esc(d.label)}" placeholder="Treino A"></label>
-      <label class="field" style="flex:2"><span>Foco</span><input id="d${di}-focus" data-d="${di}" data-f="focus" value="${esc(d.focus)}" placeholder="Peito e tríceps"></label></div>
-      ${d.exercises.map((e,ei) => `<div class="ed-ex">
-        <div class="ed-ex-head"><span class="num">${ei+1}</span>
-          <label class="field"><span>Exercício</span><input id="d${di}e${ei}-name" data-d="${di}" data-e="${ei}" data-f="name" value="${esc(e.name)}" placeholder="Ex.: Supino reto"></label>
-          <button class="mini" data-act="mv" data-d="${di}" data-e="${ei}" data-dir="-1" ${ei===0?'disabled':''} aria-label="Subir">${icon.up}</button>
-          <button class="mini" data-act="mv" data-d="${di}" data-e="${ei}" data-dir="1" ${ei===d.exercises.length-1?'disabled':''} aria-label="Descer">${icon.down}</button>
-          <button class="mini" data-act="rmex" data-d="${di}" data-e="${ei}" aria-label="Remover exercício" style="color:var(--danger)">${icon.trash}</button>
-        </div>
-        <div class="grid4">
-          <label class="field"><span>Séries</span><input id="d${di}e${ei}-sets" data-d="${di}" data-e="${ei}" data-f="sets" data-num="1" inputmode="numeric" value="${esc(e.sets)}"></label>
-          <label class="field"><span>Reps</span><input id="d${di}e${ei}-reps" data-d="${di}" data-e="${ei}" data-f="reps" value="${esc(e.reps)}" placeholder="10 ou 8-12"></label>
-          <label class="field"><span>Descanso (s)</span><input id="d${di}e${ei}-rest" data-d="${di}" data-e="${ei}" data-f="rest" data-num="1" inputmode="numeric" value="${esc(e.rest)}"></label>
-          <label class="field"><span>Carga</span><input id="d${di}e${ei}-load" data-d="${di}" data-e="${ei}" data-f="load" value="${esc(e.load)}" placeholder="20 kg"></label>
-        </div>
-        <label class="field"><span>Vídeo principal (opcional)${(e.videos||[]).length > 1 ? ' · +' + (e.videos.length - 1) + ' versões' : ''}</span><input id="d${di}e${ei}-video" data-d="${di}" data-e="${ei}" data-f="video" value="${esc(e.video)}" placeholder="https://youtube.com/..." inputmode="url"></label>
-        <label class="field"><span>Dicas de execução (opcional)</span><textarea id="d${di}e${ei}-notes" data-d="${di}" data-e="${ei}" data-f="notes">${esc(e.notes)}</textarea></label>
-      </div>`).join('')}
-      <div class="row" style="justify-content:space-between"><button class="btn ghost" data-act="addex" data-d="${di}">+ Adicionar exercício</button>
-      <button class="btn ghost danger" data-act="rmday" data-d="${di}">${confirmDel===di ? 'Toque de novo para remover' : 'Remover treino'}</button></div>
-    </section>`).join('')}
-    <button class="btn wide" data-act="addday">+ Adicionar treino</button>
+  if (edDay !== 'all' && !(edDay >= 0 && edDay < p.days.length)) edDay = p.days.length ? 0 : 'all';
+  const nEx = p.days.reduce((s, d) => s + d.exercises.length, 0);
+  $('#app').innerHTML = `<div class="head"><span class="eyebrow">Configurações · editar</span><h1>Treinos e exercícios</h1>
+    <p class="muted" style="margin:0">Filtre pelo treino, toque num exercício para editar. ${p.days.length} treino${p.days.length===1?'':'s'} · ${nEx} exercícios.</p></div>
+    <details class="card sched-wrap" ${edSchedOpen ? 'open' : ''}><summary><span><span class="eyebrow">Semana</span><b>Qual treino em cada dia</b></span><span class="chev" aria-hidden="true">›</span></summary>
+      <section class="sched" id="sched"></section></details>
+    <div class="ed-filter">
+      <div class="chips" role="group" aria-label="Filtrar por treino">
+        <button class="chip ed-chip" data-act="edday" data-v="all" aria-pressed="${edDay === 'all'}"><b>Todos</b></button>
+        ${p.days.map((d, di) => `<button class="chip ed-chip" data-act="edday" data-v="${di}" aria-pressed="${edDay === di}" style="${pcOf(d, p)}"><span class="dot">${esc(badgeOf(d))}</span><span><b>${esc(d.label || 'Treino')}</b><small>${d.exercises.length} exerc.</small></span></button>`).join('')}
+        <button class="chip" data-act="addday"><b>+ Treino</b></button>
+      </div>
+      <label class="ed-search"><span aria-hidden="true">⌕</span><input id="ed-q" type="search" placeholder="Buscar exercício pelo nome" value="${esc(edQuery)}" aria-label="Buscar exercício pelo nome" autocomplete="off"></label>
+    </div>
+    ${(edDay === 'all' ? p.days.map((d, di) => edDaySection(d, di, p)) : [edDaySection(p.days[edDay], edDay, p)]).join('')}
     <div class="savebar"><button class="btn" data-act="cancel">Cancelar</button><button class="btn primary" data-act="saveplan">Salvar plano</button></div>`;
   renderSched();
+  applyEdFilter();
+}
+function applyEdFilter(){
+  const q = edQuery.trim().toLowerCase();
+  document.querySelectorAll('.ed-day').forEach(sec => {
+    let shown = 0;
+    sec.querySelectorAll('.ed-ex').forEach(x => { const ok = !q || x.dataset.name.includes(q); x.hidden = !ok; if (ok) shown++; });
+    const none = sec.querySelector('.ed-none'); if (none) none.hidden = !(q && !shown);
+    if (edDay === 'all') sec.hidden = !!(q && !shown);
+  });
+}
+function edRowRefresh(e){
+  const row = document.querySelector(`.ed-ex[data-exid="${CSS.escape(e.id)}"]`); if (!row) return;
+  row.dataset.name = (e.name || '').toLowerCase();
+  const n = row.querySelector('.ed-row-name'); if (n) n.textContent = e.name || 'Novo exercício';
+  const s = row.querySelector('.ed-row-sum'); if (s) s.textContent = edSummary(e) + ((e.videos||[]).length ? ' · ' + e.videos.length + ' vídeo' + (e.videos.length > 1 ? 's' : '') : '');
 }
 function renderSched(){
   const el = $('#sched'); if (!el || !draft) return;
@@ -2163,6 +2236,8 @@ document.addEventListener('click', ev => {
   if (a === 'dietedit'){ dietEdit = true; render(); const t = $('#diet-notes'); if (t) t.focus(); return; }
   if (a === 'dietcancel'){ dietEdit = false; render(); return; }
   if (a === 'dietsave'){ const v = (($('#diet-notes') || {}).value || '').trim(); profile = Object.assign({}, profile || {}, {dietNotes: v}); save('profile/me', profile); dietEdit = false; render(); toast('Anotações salvas'); return; }
+  if (a === 'edday'){ edDay = b.dataset.v === 'all' ? 'all' : +b.dataset.v; renderEditor(); return; }
+  if (a === 'edtoggle'){ const id = b.dataset.id; if (edOpen.has(id)) edOpen.delete(id); else edOpen.add(id); const y = window.scrollY; renderEditor(); window.scrollTo(0, y); return; }
   if (a === 'login'){ doLogin(); return; }
   if (a === 'lgmode'){ loginMode = b.dataset.m; loginErr = ''; if (loginMode !== 'reset') loginMsg = ''; render(); const f = $('#lg-' + (loginMode === 'up' ? 'name' : 'email')); if (f) f.focus(); return; }
   if (a === 'install'){ doInstall(); return; }
@@ -2193,7 +2268,7 @@ document.addEventListener('click', ev => {
   if (a === 'cancelpf'){ pdraft = null; view = 'body'; render(); return; }
   if (a === 'day'){ viewDayId = viewDayId === id ? null : id; render(); }
   else if (a === 'vw'){ viewDayId = null; viewWd = +b.dataset.w; render(); }
-  else if (a === 'sched'){ openEditor(); const s = $('#sched'); if (s) s.scrollIntoView({block:'start'}); }
+  else if (a === 'sched'){ openEditor(); edSchedOpen = true; renderEditor(); const s = $('#sched'); if (s) s.scrollIntoView({block:'start'}); }
   else if (a === 'preset'){
     const days = {'seg-sex':[1,2,3,4,5], 'seg-sab':[1,2,3,4,5,6], 'todos':[1,2,3,4,5,6,0]}[b.dataset.p];
     if (!draft.days.length) return;
@@ -2242,15 +2317,16 @@ document.addEventListener('click', ev => {
   else if (a === 'cancel'){ draft = null; view = 'plan'; render(); window.scrollTo(0,0); }
   else if (a === 'saveplan') commitEditor();
   else if (a === 'wd'){ const d = draft.days[di], w = +b.dataset.w; d.weekdays = d.weekdays || []; d.weekdays = d.weekdays.includes(w) ? d.weekdays.filter(x=>x!==w) : d.weekdays.concat(w); b.setAttribute('aria-pressed', d.weekdays.includes(w)); }
-  else if (a === 'addex'){ draft.days[di].exercises.push(blankEx()); confirmDel = null; renderEditor(); }
+  else if (a === 'addex'){ const nx = blankEx(); draft.days[di].exercises.push(nx); edOpen.add(nx.id); edQuery = ''; confirmDel = null; renderEditor(); const f = $('#d' + di + 'e' + (draft.days[di].exercises.length - 1) + '-name'); if (f){ f.focus(); f.scrollIntoView({block:'center'}); } }
   else if (a === 'rmex'){ draft.days[di].exercises.splice(ei,1); renderEditor(); }
   else if (a === 'mv'){ const l = draft.days[di].exercises, j = ei + +b.dataset.dir; [l[ei], l[j]] = [l[j], l[ei]]; renderEditor(); }
-  else if (a === 'addday'){ draft.days.push(blankDay(draft.days.length)); confirmDel = null; renderEditor(); }
-  else if (a === 'rmday'){ if (confirmDel === di){ draft.days.splice(di,1); confirmDel = null; } else confirmDel = di; renderEditor(); }
+  else if (a === 'addday'){ const nd = blankDay(draft.days.length); draft.days.push(nd); edDay = draft.days.length - 1; edOpen = new Set([nd.exercises[0].id]); confirmDel = null; renderEditor(); }
+  else if (a === 'rmday'){ if (confirmDel === di){ draft.days.splice(di,1); confirmDel = null; if (edDay !== 'all') edDay = Math.max(0, Math.min(edDay, draft.days.length - 1)); if (!draft.days.length) edDay = 'all'; } else confirmDel = di; renderEditor(); }
 });
 document.addEventListener('input', ev => {
   const t = ev.target;
   if (t.id === 'sh-load'){ const ex = findEx(openId); if (ex){ ex.load = t.value; savePlan(); if ((log.sets[ex.id] || 0) > 0) saveLog(); } return; }
+  if (t.id === 'ed-q'){ edQuery = t.value; applyEdFilter(); return; }
   if (t.dataset.lg){ lg[t.dataset.lg] = t.value; return; }
   if (bdraft && t.dataset.m){ bdraft[t.dataset.m] = t.value; return; }
   if (vdraft && t.dataset.vl != null){ vdraft[+t.dataset.vl].label = t.value; return; }
@@ -2260,7 +2336,8 @@ document.addEventListener('input', ev => {
   const d = draft.days[+t.dataset.d];
   const target = t.dataset.e != null ? d.exercises[+t.dataset.e] : d;
   target[t.dataset.f] = t.value;
-  if (t.dataset.e == null) renderSched();
+  if (t.dataset.e == null){ renderSched(); if (t.dataset.f === 'label'){ const c = document.querySelector('.ed-chip[data-v="' + t.dataset.d + '"] b'); if (c) c.textContent = t.value || 'Treino'; } }
+  else edRowRefresh(target);
 });
 document.addEventListener('change', ev => {
   const t = ev.target;
