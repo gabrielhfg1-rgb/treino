@@ -681,6 +681,26 @@ h1,h2,h3{font-weight:700;letter-spacing:.02em}
 .peek{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:42px;height:42px;display:grid;place-items:center;border:0;border-radius:10px;background:none;color:#8a95c2;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .peek:hover,.peek[aria-pressed="true"]{color:#7fe6f7}
 .peek:focus-visible{outline:2px solid #22d3ee;outline-offset:-2px}
+/* alarme do descanso */
+.al-box{display:flex;flex-direction:column;gap:12px;padding:12px 14px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.04)}
+.al-top{display:flex;align-items:center;gap:12px}
+.al-top b{display:block;font-weight:700}
+.al-top small{display:block;font-size:.78rem;color:var(--muted)}
+.al-top .pb{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;flex:none;background:rgba(34,211,238,.12);color:#7fe6f7;border:1px solid rgba(34,211,238,.3)}
+.al-top .pb svg{width:18px;height:18px}
+.switch{position:relative;width:52px;height:30px;flex:none;border-radius:99px;border:1px solid var(--line);background:rgba(255,255,255,.08);padding:0;cursor:pointer}
+.switch i{position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#8a95c2;transition:transform .18s,background .18s}
+.switch[aria-checked="true"]{background:linear-gradient(90deg,#22d3ee,#8b5cf6);border-color:transparent}
+.switch[aria-checked="true"] i{transform:translateX(22px);background:#fff}
+.al-sl{display:flex;flex-direction:column;gap:6px}
+.al-l{display:flex;justify-content:space-between;align-items:baseline}
+.al-l b{font-size:.9rem}
+.al-l output{font-family:var(--display);font-weight:700;color:#7fe6f7;font-variant-numeric:tabular-nums}
+.al-sl small{font-size:.74rem;color:var(--muted)}
+.al-sl input[type=range]{width:100%;accent-color:#22d3ee;height:28px}
+.al-sl input:disabled{opacity:.4}
+.al-row{display:flex;align-items:center;gap:8px}
+.al-row .btn svg{width:16px;height:16px}
 /* ajustes para a fonte técnica, que é mais larga */
 .hero h1{font-size:clamp(2.1rem,10vw,3rem);line-height:.95;overflow-wrap:normal}
 .big b{font-size:clamp(3.4rem,17vw,4.6rem)}
@@ -1169,22 +1189,63 @@ function clockText(ex){
   const s = timer.id === ex.id && (timer.iv || timer.over) ? timer.left : (+ex.rest||0);
   return timer.over && timer.id === ex.id ? 'Bora!' : Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
 }
-function beep(){
-  try{ if(!audio) return; const o = audio.createOscillator(), g = audio.createGain(); o.frequency.value = 880; g.gain.setValueAtTime(.25, audio.currentTime); g.gain.exponentialRampToValueAtTime(.001, audio.currentTime+.6); o.connect(g).connect(audio.destination); o.start(); o.stop(audio.currentTime+.6); }catch(e){}
-  try{ navigator.vibrate && navigator.vibrate([200,100,200]); }catch(e){}
+/* alarme do fim do descanso: começa no volume mínimo e sobe até o máximo */
+const ALARM_DEF = {on:true, min:40, max:100, vib:true};
+function alarmCfg(){ return Object.assign({}, ALARM_DEF, local.get('alarm') || {}); }
+function setAlarmCfg(c){ local.set('alarm', c); }
+function audioOn(){
+  try{ if(!audio) audio = new (window.AudioContext||window.webkitAudioContext)(); if (audio.state !== 'running' && audio.resume) audio.resume(); }catch(e){}
+  return audio;
 }
+// um bipe curto; vol de 0 a 100
+function tone(at, freq, dur, vol, dest){
+  const a = audio; if (!a || vol <= 0) return;
+  const peak = Math.pow(vol / 100, 1.6) * 0.9;
+  const g = a.createGain();
+  g.gain.setValueAtTime(0.0001, at);
+  g.gain.exponentialRampToValueAtTime(peak, at + 0.015);
+  g.gain.setValueAtTime(peak, at + dur - 0.05);
+  g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+  g.connect(dest || a.destination);
+  for (const [f, type, mix] of [[freq, 'square', 0.55], [freq * 1.5, 'triangle', 0.45]]){
+    const o = a.createOscillator(), m = a.createGain();
+    o.type = type; o.frequency.value = f; m.gain.value = mix;
+    o.connect(m).connect(g); o.start(at); o.stop(at + dur + 0.02);
+  }
+}
+let alarmStop = null;
+function playAlarm(cfg){
+  cfg = cfg || alarmCfg();
+  stopAlarm();
+  if (cfg.vib) try{ navigator.vibrate && navigator.vibrate([300,120,300,120,300,400,300,120,300,120,300]); }catch(e){}
+  if (!cfg.on || !audioOn()) return;
+  const bus = audio.createGain(); bus.connect(audio.destination);
+  const lo = Math.min(cfg.min, cfg.max), hi = Math.max(cfg.min, cfg.max), rounds = 4, t0 = audio.currentTime + 0.05;
+  for (let r = 0; r < rounds; r++){
+    const v = lo + (hi - lo) * (rounds > 1 ? r / (rounds - 1) : 1);   // sobe a cada rodada
+    for (let k = 0; k < 3; k++) tone(t0 + r * 1.1 + k * 0.22, 988, 0.16, v, bus);
+  }
+  const id = setTimeout(() => { alarmStop = null; }, rounds * 1100 + 200);
+  alarmStop = () => { clearTimeout(id); try{ bus.disconnect(); }catch(e){} try{ navigator.vibrate && navigator.vibrate(0); }catch(e){} };
+}
+function stopAlarm(){ if (alarmStop){ const f = alarmStop; alarmStop = null; f(); } }
+// aviso nos últimos 3 segundos, no volume mínimo
+function tick(){ const c = alarmCfg(); if (c.on && audioOn()) tone(audio.currentTime + 0.01, 660, 0.09, Math.max(15, Math.min(c.min, c.max))); }
+function beep(){ playAlarm(); }
 function startTimer(ex){
-  try{ if(!audio) audio = new (window.AudioContext||window.webkitAudioContext)(); audio.resume && audio.resume(); }catch(e){}
+  audioOn(); stopAlarm();
   stopTimer();
   timer = {left:+ex.rest||0, total:+ex.rest||0, id:ex.id, iv:null, over:false};
   const end = Date.now() + timer.left*1000;
+  let lastTick = null;
   timer.iv = setInterval(() => {
     timer.left = Math.max(0, Math.round((end - Date.now())/1000));
+    if (timer.left > 0 && timer.left <= 3 && lastTick !== timer.left){ lastTick = timer.left; tick(); }
     if (timer.left <= 0){ clearInterval(timer.iv); timer.iv = null; timer.over = true; beep(); }
     if (openId === timer.id){ const c = $('#sh-clock'); if (c && !timer.over) c.textContent = clockText(ex); else if (timer.over) renderSheet(); }
   }, 250);
 }
-function stopTimer(){ if (timer.iv) clearInterval(timer.iv); timer = {left:0,total:0,id:null,iv:null,over:false}; }
+function stopTimer(){ stopAlarm(); if (timer.iv) clearInterval(timer.iv); timer = {left:0,total:0,id:null,iv:null,over:false}; }
 
 /* ---------- editor ---------- */
 function blankEx(){ return {id:uid(), name:'', sets:3, reps:'12', rest:60, load:'', video:'', notes:''}; }
@@ -1808,7 +1869,7 @@ function renderProg(){
       <div><b>${fmt(avg)}</b><small>média por semana</small></div>
     </div></section>`;
   if (!dates.length){
-    app.innerHTML = `${topbar()}${hero}<div class="home-quick">${todayCard()}${waterCard(true)}</div>${calendarCard()}<div class="empty"><h2>Seus gráficos aparecem aqui</h2>
+    app.innerHTML = `${topbar()}${hero}<div class="home-quick">${waterCard(true)}${todayCard()}</div>${calendarCard()}<div class="empty"><h2>Seus gráficos aparecem aqui</h2>
       <p class="muted">Marque as séries na tela de treino e anote a carga de cada exercício. A partir do primeiro treino o app monta a frequência, o calendário, a evolução de carga e o volume.</p>
       <div><button class="btn primary" data-act="tab" data-v="today">Ir para o treino</button></div></div>`;
     return;
@@ -1831,7 +1892,7 @@ function renderProg(){
   const volCard = vol.length ? `<div class="card"><h2>Volume por treino</h2><p class="muted" style="margin:0;font-size:.86rem">Séries × repetições × carga somados em cada dia. Linha subindo = mais trabalho total.</p>
       <div class="chart" id="chart-vol">${lineChart('chart-vol', vol, 'kg', 'Volume por treino', 0)}</div></div>` : '';
   app.innerHTML = `${topbar()}${hero}
-    <div class="home-quick">${todayCard()}${waterCard(true)}</div>
+    <div class="home-quick">${waterCard(true)}${todayCard()}</div>
     ${calendarCard()}
     <div class="card"><div class="card-top"><h2>Treinos por semana</h2><span class="pill">últimas 12</span></div><div class="chart">${barsSVG(weeks, goal)}</div>
       <p class="muted" style="margin:0;font-size:.82rem">A linha verde é a sua meta: ${goal} treinos por semana, conforme o seu plano.</p></div>
@@ -1991,6 +2052,7 @@ function renderPlanConfig(){
         <button class="cfg" data-act="edit" ${hasPlan ? '' : 'disabled'}><span class="cfg-i">${icon.list}</span><span><b>Editar treinos e exercícios</b><small>Séries, repetições, descanso, carga e vídeos</small></span><span class="go2">›</span></button>
         <button class="cfg" data-act="sched" ${hasPlan ? '' : 'disabled'}><span class="cfg-i">${icon.chart}</span><span><b>Montar a semana</b><small>Qual treino em cada dia, de segunda a domingo</small></span><span class="go2">›</span></button>
         <button class="cfg" data-act="newplan"><span class="cfg-i">${icon.dumbbell}</span><span><b>${newConfirm ? 'Toque de novo para começar do zero' : 'Criar um plano do zero'}</b><small>${hasPlan ? 'Substitui o plano atual por um em branco' : 'Monte seus próprios treinos'}</small></span><span class="go2">›</span></button>
+        <button class="cfg" data-act="alarm"><span class="cfg-i">${icon.sound}</span><span><b>Alarme do descanso</b><small>Som ao fim do descanso, volume mínimo e máximo</small></span><span class="go2">›</span></button>
         <button class="cfg" data-act="account"><span class="cfg-i">${icon.down}</span><span><b>Backup do plano</b><small>Baixar ou restaurar plano, treinos e medidas</small></span><span class="go2">›</span></button>
       </div></div>
     <div class="card" id="models"><div class="card-top"><h2>Trocar por um modelo</h2>${tplData ? `<span class="pill">${list.length} de ${tplData.templates.length}</span>` : ''}</div>
@@ -2232,7 +2294,7 @@ function renderAccount(){
   const el = $('#sheet');
   el.innerHTML = `<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="ac-t">
     <div class="grab"></div>
-    <div class="sheet-top"><div style="min-width:0"><span class="eyebrow">Conta e backup</span><h2 id="ac-t" style="margin-top:6px">${esc(account ? (account.name || 'Sua conta') : 'Modo local')}</h2>
+    <div class="sheet-top"><div style="min-width:0"><span class="eyebrow">Configurações</span><h2 id="ac-t" style="margin-top:6px">${esc(account ? (account.name || 'Sua conta') : 'Modo local')}</h2>
       <p class="muted" style="margin:6px 0 0">${account ? esc(account.email) + ' · sincronizado' : noCloud ? 'O Firebase ainda não foi configurado: os dados ficam só neste aparelho.' : 'Sem conexão com a conta.'}</p></div>
       <button class="x" data-act="close" aria-label="Fechar">${icon.x}</button></div>
     <div class="vids">
@@ -2242,10 +2304,26 @@ function renderAccount(){
       <button class="vid-alt" data-act="mute-set" style="border:0;text-align:left;width:100%"><span class="pb">${isMuted() ? icon.muted : icon.sound}</span><span><b>Som dos vídeos: ${isMuted() ? 'desligado' : 'ligado'}</b><small>${isMuted() ? 'Toque para ligar o som em todos os vídeos' : 'Toque para tocar todos os vídeos sem som'}</small></span></button>
       ${isStandalone() ? '' : `<button class="vid-alt" data-act="install" style="border:0;text-align:left;width:100%"><span class="pb">${icon.down}</span><span><b>Instalar o app</b><small>Ícone na tela inicial, abre como aplicativo</small></span></button>`}
     </div>
+    ${alarmBlock()}
     ${account && cloudRef && cloudRef.providers ? pwBlock() : ''}
     ${account ? '<button class="btn danger" data-act="logout">Sair da conta</button>' : ''}
   </div>`;
   el.hidden = false;
+}
+/* ---------- alarme do descanso (configurações) ---------- */
+function alarmBlock(){
+  const c = alarmCfg();
+  const sl = (k, label, hint) => `<label class="al-sl"><span class="al-l"><b>${label}</b><output id="al-${k}-v">${c[k]}%</output></span>
+    <input type="range" id="al-${k}" data-al="${k}" min="0" max="100" step="5" value="${c[k]}" ${c.on ? '' : 'disabled'} aria-label="${label}"><small>${hint}</small></label>`;
+  return `<section class="al-box" id="alarm-cfg">
+    <div class="al-top"><span class="pb">${c.on ? icon.sound : icon.muted}</span><span style="flex:1;min-width:0"><b>Alarme do descanso</b><small>Toca quando o tempo de descanso acaba</small></span>
+      <button class="switch" data-act="al-on" role="switch" aria-checked="${c.on}" aria-label="Alarme ligado"><i></i></button></div>
+    ${sl('min', 'Volume mínimo', 'Começa neste volume (e é o volume do aviso dos 3 últimos segundos)')}
+    ${sl('max', 'Volume máximo', 'Vai subindo até este volume se você não parar')}
+    <div class="al-row"><button class="chip" data-act="al-vib" aria-pressed="${c.vib}"><b>Vibrar também</b></button>
+      <span style="flex:1"></span><button class="btn" data-act="al-test" ${c.on || c.vib ? '' : 'disabled'}>${icon.play} Testar</button></div>
+    <p class="muted" style="margin:0;font-size:.78rem">O som segue o volume do celular. No iPhone, com o botão de silencioso ligado, só vibra.</p>
+  </section>`;
 }
 /* ---------- alterar senha ---------- */
 const pw = {open:false, cur:'', n1:'', n2:'', err:'', msg:'', busy:false};
@@ -2374,6 +2452,10 @@ document.addEventListener('click', ev => {
   if (a === 'tplopen'){ tplOpen = b.dataset.id; tplConfirm = false; renderTplSheet(); return; }
   if (a === 'tpluse'){ if (tplConfirm) applyTemplate(); else { tplConfirm = true; renderTplSheet(); } return; }
   if (a === 'peek'){ togglePeek(b); return; }
+  if (a === 'al-on'){ const c = alarmCfg(); c.on = !c.on; setAlarmCfg(c); renderAccount(); if (c.on){ audioOn(); tone(audio.currentTime + 0.02, 988, 0.16, c.min); } return; }
+  if (a === 'al-vib'){ const c = alarmCfg(); c.vib = !c.vib; setAlarmCfg(c); b.setAttribute('aria-pressed', c.vib); if (c.vib) try{ navigator.vibrate && navigator.vibrate(150); }catch(e){} return; }
+  if (a === 'al-test'){ audioOn(); playAlarm(); return; }
+  if (a === 'alarm'){ renderAccount(); const x = $('#alarm-cfg'); if (x) x.scrollIntoView({block:'start'}); return; }
   if (a === 'account'){ pwReset(); renderAccount(); return; }
   if (a === 'pwtoggle'){ const o = !pw.open; pwReset(); pw.open = o; renderAccount(); if (o) pwFocus(); return; }
   if (a === 'pwforgot'){ doPwForgot(); return; }
@@ -2446,11 +2528,21 @@ document.addEventListener('click', ev => {
   else if (a === 'addday'){ const nd = blankDay(draft.days.length); draft.days.push(nd); edDay = draft.days.length - 1; edOpen = new Set([nd.exercises[0].id]); confirmDel = null; renderEditor(); }
   else if (a === 'rmday'){ if (confirmDel === di){ draft.days.splice(di,1); confirmDel = null; if (edDay !== 'all') edDay = Math.max(0, Math.min(edDay, draft.days.length - 1)); if (!draft.days.length) edDay = 'all'; } else confirmDel = di; renderEditor(); }
 });
+// tocar em qualquer lugar da tela cala o alarme
+document.addEventListener('pointerdown', ev => { if (alarmStop && !(ev.target.closest && ev.target.closest('[data-act="al-test"]'))) stopAlarm(); }, true);
+document.addEventListener('change', ev => { const t = ev.target; if (t.dataset && t.dataset.al){ audioOn(); if (audio) tone(audio.currentTime + 0.02, 988, 0.16, +t.value); } });
 document.addEventListener('mousedown', ev => { if (ev.target.closest && ev.target.closest('.peek')) ev.preventDefault(); });
 document.addEventListener('input', ev => {
   const t = ev.target;
   if (t.id === 'sh-load'){ const ex = findEx(openId); if (ex){ ex.load = t.value; savePlan(); if ((log.sets[ex.id] || 0) > 0) saveLog(); } return; }
   if (t.id === 'ed-q'){ edQuery = t.value; applyEdFilter(); return; }
+  if (t.dataset.al){
+    const c = alarmCfg(), k = t.dataset.al, o = k === 'min' ? 'max' : 'min'; c[k] = +t.value;
+    // mínimo nunca passa do máximo
+    if (c.min > c.max){ c[o] = c[k]; const s2 = $('#al-' + o); if (s2) s2.value = c[o]; const v2 = $('#al-' + o + '-v'); if (v2) v2.textContent = c[o] + '%'; }
+    const v = $('#al-' + k + '-v'); if (v) v.textContent = c[k] + '%';
+    setAlarmCfg(c); return;
+  }
   if (t.dataset.pw){ pw[t.dataset.pw] = t.value; return; }
   if (t.dataset.lg){ lg[t.dataset.lg] = t.value; return; }
   if (bdraft && t.dataset.m){ bdraft[t.dataset.m] = t.value; return; }
