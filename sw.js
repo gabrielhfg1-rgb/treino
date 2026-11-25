@@ -1,6 +1,6 @@
 // Deixa o app abrir mesmo sem internet (os dados vêm da cópia do Firebase no aparelho).
 // Ao publicar uma versão nova, aumente o número abaixo para os celulares atualizarem.
-const CACHE = 'treino-v13';
+const CACHE = 'treino-v14';
 const FILES = ['./', './index.html', './cloud.js', './firebase-config.js', './manifest.webmanifest', './templates.json',
   './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png', './icons/favicon-32.png'];
 

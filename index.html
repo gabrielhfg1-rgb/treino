@@ -764,14 +764,33 @@ const local = {
   set(k,v){ try{ localStorage.setItem('treino:'+k, JSON.stringify(v)); }catch(e){} }
 };
 const timers = {}, queues = {};
+/* o que foi salvo e ainda não chegou na conta fica numa lista; é enviado assim que conectar */
+function markPending(path){ const p = local.get('pending') || []; if (!p.includes(path)){ p.push(path); local.set('pending', p); } }
+function clearPending(path){ local.set('pending', (local.get('pending') || []).filter(x => x !== path)); }
+function localValue(path){
+  if (path === 'plan/current' || path === 'profile/me') return local.get(path);
+  const [c, id] = path.split('/');
+  if (c === 'logs') return trainLog[id];
+  if (c === 'water') return waterLog[id];
+  if (c === 'measures'){ const m = measures.find(x => x.id === id); if (!m) return undefined; const b = clone(m); delete b.id; return b; }
+}
+function pushPath(path){
+  const v = localValue(path), c = path.split('/')[0];
+  if (v == null && c !== 'measures'){ clearPending(path); return; }
+  const w = v == null ? db.doc(path).delete() : db.doc(path).set(clone(v));
+  w.then(() => clearPending(path)).catch(() => {});
+}
+function flushPending(){ (local.get('pending') || []).forEach(pushPath); }
 function save(path, data){
   local.set(path, data);
+  markPending(path);
   if (mode !== 'db') return;
   clearTimeout(timers[path]);
   timers[path] = setTimeout(() => {
     const body = clone(data);
     queues[path] = (queues[path] || Promise.resolve())
       .then(() => db.doc(path).set(body))
+      .then(() => clearPending(path))
       .catch(e => toast(e && e.code === 'quota_exceeded' ? 'Espaço cheio: não deu para salvar.' : 'Não deu para salvar agora. Confira sua conexão.'));
   }, 350);
 }
@@ -818,27 +837,40 @@ async function init(){
   } else noCloud = true;
   if (!d){ mode = 'local'; loaded = true; render(); return; }
   db = d; mode = 'db';
+  flushPending();
+  // uma vez por aparelho: manda para a conta o que só existe aqui (salvo por versões antigas do app)
+  const backfill = !local.get('backfilled');
+  const fill = (coll, have, items) => { if (!backfill) return; for (const [id, v] of items) if (!have.has(id) && v) pushPath(coll + '/' + id); };
   const t = setTimeout(() => { slow = true; loaded = true; render(); }, 10000);
   db.doc('plan/current').onSnapshot(s => {
     if (!s.metadata.fromCache){ clearTimeout(t); slow = false; }
     if (s.exists){ plan = clone(s.data()); local.set('plan/current', plan); }
-    else if (!s.metadata.fromCache && !plan) plan = null;
-    loaded = true;
-    if (view === 'today' || view === 'prog' || view === 'health') render();
-  }, () => { clearTimeout(t); mode = 'local'; loaded = true; render(); });
+    else if (!s.metadata.fromCache && plan) pushPath('plan/current');   // a conta não tem plano, mas o aparelho tem: envia
+    if (!s.metadata.fromCache || s.exists || plan) loaded = true;       // não mostra "sem plano" antes de a conta responder
+    if (['today','prog','health','plan'].includes(view)) render();
+  }, () => { clearTimeout(t); loaded = true; render(); toast('Não deu para ler sua conta agora. O que você salvar será enviado depois.'); });
   db.doc('profile/me').onSnapshot(s => {
     if (s.exists && !s.metadata.hasPendingWrites){ profile = clone(s.data()); local.set('profile/me', profile); if (view === 'body' || view === 'health' || view === 'prog') render(); }
+    else if (!s.exists && !s.metadata.fromCache && profile) pushPath('profile/me');
   }, () => {});
   db.collection('measures').onSnapshot(s => {
     if (s.metadata.hasPendingWrites) return;
     if (s.metadata.fromCache && s.empty) return;
-    measures = s.docs.map(d => Object.assign(clone(d.data()), {id:d.id})); sortM(); local.set('measures', measures);
+    const mine = measures, got = s.docs.map(d => Object.assign(clone(d.data()), {id:d.id})), ids = new Set(got.map(m => m.id));
+    const pend = new Set(local.get('pending') || []);
+    if (!s.metadata.fromCache) fill('measures', ids, mine.map(m => [m.id, m]));
+    measures = got.filter(m => !(pend.has('measures/' + m.id) && !mine.some(x => x.id === m.id)))
+      .concat(mine.filter(m => !ids.has(m.id) && (backfill || pend.has('measures/' + m.id))));
+    sortM(); local.set('measures', measures);
     if (view === 'body' || view === 'health' || view === 'prog') render();
   }, () => {});
   db.collection('water').onSnapshot(s => {
     if (s.metadata.hasPendingWrites) return;
     if (s.metadata.fromCache && s.empty) return;
     const h = {}; s.docs.forEach(d => { h[d.id] = clone(d.data()); });
+    const pend = new Set(local.get('pending') || []);
+    if (!s.metadata.fromCache) fill('water', new Set(Object.keys(h)), Object.entries(waterLog));
+    for (const [k, v] of Object.entries(waterLog)) if (!(k in h) && v && (backfill || pend.has('water/' + k))) h[k] = v;
     waterLog = h; local.set('water', waterLog);
     if (view === 'health' || view === 'prog') render();
   }, () => {});
@@ -846,6 +878,9 @@ async function init(){
     if (s.metadata.hasPendingWrites) return;
     if (s.metadata.fromCache && s.empty) return;
     const h = {}; s.docs.forEach(d => { h[d.id] = clone(d.data()); });
+    const pend = new Set(local.get('pending') || []);
+    if (!s.metadata.fromCache){ fill('logs', new Set(Object.keys(h)), Object.entries(trainLog)); local.set('backfilled', true); }
+    for (const [k, v] of Object.entries(trainLog)) if (!(k in h) && v && (backfill || pend.has('logs/' + k))) h[k] = v;
     trainLog = h; local.set('history', trainLog);
     if (trainLog[logKey]){ log = trainLog[logKey]; if (!log.sets) log.sets = {}; }
     if (view === 'today' || view === 'prog') render();
@@ -1340,14 +1375,17 @@ function saveMeasure(e){
   const i = measures.findIndex(x => x.id === e.id);
   if (i >= 0) measures[i] = e; else measures.push(e);
   sortM(); local.set('measures', measures);
+  markPending('measures/' + e.id);
   if (mode !== 'db') return;
   const body = clone(e); delete body.id;
   queues['m:'+e.id] = (queues['m:'+e.id] || Promise.resolve()).then(() => db.collection('measures').doc(e.id).set(body))
+    .then(() => clearPending('measures/' + e.id))
     .catch(() => toast('Não deu para salvar a medição. Confira sua conexão.'));
 }
 function deleteMeasure(id){
   measures = measures.filter(x => x.id !== id); local.set('measures', measures);
-  if (mode === 'db') db.collection('measures').doc(id).delete().catch(() => toast('Não deu para excluir agora. Confira sua conexão.'));
+  markPending('measures/' + id);
+  if (mode === 'db') db.collection('measures').doc(id).delete().then(() => clearPending('measures/' + id)).catch(() => toast('Não deu para excluir agora. Confira sua conexão.'));
 }
 
 const TILE_KEYS = ['weight','bmi','fatPct','muscleKg','smmKg','visceral','waterPct','bmr','waist','abdomen','metaAge','restHr'];
