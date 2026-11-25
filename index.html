@@ -675,6 +675,12 @@ h1,h2,h3{font-weight:700;letter-spacing:.02em}
 .pw-box{display:flex;flex-direction:column;gap:10px}
 .pw-box.open > .vid-alt{border-color:rgba(34,211,238,.45)}
 .pw-box .lg-form{padding:12px;border-radius:14px;border:1px solid var(--line);background:rgba(5,7,18,.5)}
+/* olho da senha */
+.pw-wrap{position:relative;display:block}
+.pw-wrap input{padding-right:50px}
+.peek{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:42px;height:42px;display:grid;place-items:center;border:0;border-radius:10px;background:none;color:#8a95c2;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.peek:hover,.peek[aria-pressed="true"]{color:#7fe6f7}
+.peek:focus-visible{outline:2px solid #22d3ee;outline-offset:-2px}
 /* ajustes para a fonte técnica, que é mais larga */
 .hero h1{font-size:clamp(2.1rem,10vw,3rem);line-height:.95;overflow-wrap:normal}
 .big b{font-size:clamp(3.4rem,17vw,4.6rem)}
@@ -732,6 +738,8 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt
 const clone = o => JSON.parse(JSON.stringify(o));
 const uid = () => Math.random().toString(36).slice(2, 9);
 const icon = {
+  eye:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+  eyeOff:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.6 5.1A10.8 10.8 0 0 1 12 5c6.4 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4.1M6.6 6.6A17.4 17.4 0 0 0 2 12s3.6 7 10 7a10 10 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M3 3l18 18"/></svg>',
   lock:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.2" fill="currentColor" stroke="none"/></svg>',
   check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
   play:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M10 8.5v7l6-3.5z" fill="currentColor" stroke="none"/></svg>',
@@ -2097,9 +2105,25 @@ function renderInstallHelp(){
 let account = null, noCloud = false, cloudRef = null;
 let loginMode = 'in', loginErr = '', loginMsg = '', loginBusy = false;
 const lg = {name:'', email:'', pass:'', pass2:''};
+/* olho para mostrar/esconder a senha */
+const peekOn = new Set();
+function peekType(id){ return peekOn.has(id) ? 'text' : 'password'; }
+function peekWrap(input, id){
+  const on = peekOn.has(id);
+  return `<div class="pw-wrap">${input}<button type="button" class="peek" data-act="peek" data-for="${id}" aria-pressed="${on}" aria-label="${on ? 'Esconder senha' : 'Mostrar senha'}">${on ? icon.eyeOff : icon.eye}</button></div>`;
+}
+function togglePeek(b){
+  const id = b.dataset.for, i = document.getElementById(id); if (!i) return;
+  if (peekOn.has(id)) peekOn.delete(id); else peekOn.add(id);
+  const on = peekOn.has(id);
+  i.type = on ? 'text' : 'password';
+  b.setAttribute('aria-pressed', on); b.setAttribute('aria-label', on ? 'Esconder senha' : 'Mostrar senha');
+  b.innerHTML = on ? icon.eyeOff : icon.eye;
+  if (document.activeElement !== i){ i.focus(); const n = i.value.length; try { i.setSelectionRange(n, n); } catch(e){} }
+}
 function renderLogin(){
   const up = loginMode === 'up', reset = loginMode === 'reset';
-  const field = (id, label, type, key, extra) => `<label class="lg-field"><span>${label}</span><input id="lg-${key}" data-lg="${key}" type="${type}" value="${esc(lg[key])}" ${extra || ''}></label>`;
+  const field = (id, label, type, key, extra) => { const inp = `<input id="lg-${key}" data-lg="${key}" type="${type === 'password' ? peekType('lg-' + key) : type}" value="${esc(lg[key])}" ${extra || ''}>`; return `<label class="lg-field"><span>${label}</span>${type === 'password' ? peekWrap(inp, 'lg-' + key) : inp}</label>`; };
   $('#app').innerHTML = `
     <div class="lg">
       <div class="lg-brand"><img src="icons/icon-192.png" alt="" width="84" height="84"><div><span class="eyebrow">Sistema de treino</span><h1>Treino do Dia</h1></div></div>
@@ -2190,7 +2214,7 @@ const pw = {open:false, cur:'', n1:'', n2:'', err:'', msg:'', busy:false};
 function pwHasPass(){ try { return cloudRef.providers().includes('password'); } catch(e){ return false; } }
 function pwBlock(){
   const has = pwHasPass();
-  const f = (key, label, ac, ph) => `<label class="lg-field"><span>${label}</span><input id="pw-${key}" data-pw="${key}" type="password" value="${esc(pw[key])}" autocomplete="${ac}" placeholder="${ph}" required></label>`;
+  const f = (key, label, ac, ph) => `<label class="lg-field"><span>${label}</span>${peekWrap(`<input id="pw-${key}" data-pw="${key}" type="${peekType('pw-' + key)}" value="${esc(pw[key])}" autocomplete="${ac}" placeholder="${ph}" required>`, 'pw-' + key)}</label>`;
   return `<div class="pw-box${pw.open ? ' open' : ''}">
     <button class="vid-alt" data-act="pwtoggle" aria-expanded="${pw.open}" style="border:0;text-align:left;width:100%"><span class="pb">${icon.lock}</span><span><b>${has ? 'Alterar senha' : 'Criar senha de acesso'}</b><small>${has ? 'Troque a senha que você usa para entrar' : 'Você entra com o Google; crie uma senha para entrar também com e-mail'}</small></span></button>
     ${pw.msg ? `<p class="lg-msg ok" role="status">${esc(pw.msg)}</p>` : ''}
@@ -2205,7 +2229,7 @@ function pwBlock(){
     </form>` : ''}
   </div>`;
 }
-function pwReset(){ Object.assign(pw, {open:false, cur:'', n1:'', n2:'', err:'', msg:'', busy:false}); }
+function pwReset(){ ['pw-cur','pw-n1','pw-n2'].forEach(k => peekOn.delete(k)); Object.assign(pw, {open:false, cur:'', n1:'', n2:'', err:'', msg:'', busy:false}); }
 function pwFocus(){ const i = $('#pw-cur') || $('#pw-n1'); if (i) i.focus(); }
 async function doChangePassword(){
   const has = pwHasPass();
@@ -2311,6 +2335,7 @@ document.addEventListener('click', ev => {
   if (a === 'tplgoal'){ tplGoal = b.dataset.g; render(); return; }
   if (a === 'tplopen'){ tplOpen = b.dataset.id; tplConfirm = false; renderTplSheet(); return; }
   if (a === 'tpluse'){ if (tplConfirm) applyTemplate(); else { tplConfirm = true; renderTplSheet(); } return; }
+  if (a === 'peek'){ togglePeek(b); return; }
   if (a === 'account'){ pwReset(); renderAccount(); return; }
   if (a === 'pwtoggle'){ const o = !pw.open; pwReset(); pw.open = o; renderAccount(); if (o) pwFocus(); return; }
   if (a === 'pwforgot'){ doPwForgot(); return; }
@@ -2383,6 +2408,7 @@ document.addEventListener('click', ev => {
   else if (a === 'addday'){ const nd = blankDay(draft.days.length); draft.days.push(nd); edDay = draft.days.length - 1; edOpen = new Set([nd.exercises[0].id]); confirmDel = null; renderEditor(); }
   else if (a === 'rmday'){ if (confirmDel === di){ draft.days.splice(di,1); confirmDel = null; if (edDay !== 'all') edDay = Math.max(0, Math.min(edDay, draft.days.length - 1)); if (!draft.days.length) edDay = 'all'; } else confirmDel = di; renderEditor(); }
 });
+document.addEventListener('mousedown', ev => { if (ev.target.closest && ev.target.closest('.peek')) ev.preventDefault(); });
 document.addEventListener('input', ev => {
   const t = ev.target;
   if (t.id === 'sh-load'){ const ex = findEx(openId); if (ex){ ex.load = t.value; savePlan(); if ((log.sets[ex.id] || 0) > 0) saveLog(); } return; }
