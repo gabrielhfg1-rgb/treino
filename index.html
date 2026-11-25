@@ -601,6 +601,47 @@ h1,h2,h3{font-weight:700;letter-spacing:.02em}
 .diet-notes{padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
 @media (min-width:520px){.home-quick{grid-template-columns:1fr 1fr}}
 .nav button{padding:8px 2px;font-size:.66rem}
+.dstats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dstats > div{border-radius:16px;padding:12px 14px;background:rgba(255,255,255,.05);border:1px solid var(--line);display:flex;flex-direction:column;gap:4px;min-width:0}
+.dstats small{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#9fb0e8}
+.dstats b{font-family:var(--display);font-size:1.7rem;line-height:1;color:#f2f5ff;white-space:nowrap}
+.dstats b i{font-style:normal;font-size:.8rem;color:var(--muted);margin-left:3px}
+.dstats em{font-style:normal;font-size:.74rem;color:var(--muted)}
+.dstats .ds-main{grid-column:1/-1;flex-direction:row;align-items:center;justify-content:space-between;gap:12px;
+  background:linear-gradient(120deg,rgba(34,211,238,.12),rgba(139,92,246,.14));border-color:rgba(34,211,238,.35)}
+.dstats .ds-main > div{display:flex;flex-direction:column;gap:4px;min-width:0}
+.dstats .ds-main b{font-size:2.2rem;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.dstats .ds-main b i{-webkit-text-fill-color:var(--muted)}
+.dstats .water{border-color:rgba(56,189,248,.35)}
+.dstats .water b{color:#bae6fd}
+/* configurações do plano */
+.plan-cur h1{font-size:clamp(1.8rem,8vw,2.4rem)}
+.pc-days{display:flex;flex-direction:column;gap:6px}
+.pc-day{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--iron-line)}
+.pc-day i{font-style:normal;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;flex:none;background:var(--pc);color:var(--pf);font-family:var(--display);font-weight:700;font-size:.8rem;box-shadow:0 0 12px color-mix(in srgb,var(--pc) 55%,transparent)}
+.pc-day > span{display:flex;flex-direction:column;min-width:0}
+.pc-day b{font-size:.92rem;font-weight:700}
+.pc-day small{font-size:.74rem;color:var(--iron-muted);text-transform:capitalize}
+.cfg-list{display:flex;flex-direction:column;gap:8px}
+.cfg{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--fg);font:inherit}
+.cfg:disabled{opacity:.45}
+.cfg > span:nth-child(2){flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
+.cfg b{font-weight:700}
+.cfg small{font-size:.78rem;color:var(--muted)}
+.cfg-i{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;flex:none;background:rgba(34,211,238,.12);color:#7fe6f7;border:1px solid rgba(34,211,238,.3)}
+.cfg-i svg{width:18px;height:18px}
+.cfg .go2{color:var(--muted);font-size:1.3rem}
+.filters{display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:16px;background:rgba(5,7,18,.45);border:1px solid var(--line)}
+.flt{display:flex;flex-direction:column;gap:6px}
+.flt-l{font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#9fb0e8}
+.flt-c{padding-bottom:2px}
+.flt-c .chip{padding:7px 12px;border-radius:99px}
+.flt-c .chip b{font-size:.82rem}
+.tpl-tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:99px;background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--muted)}
+.tag.g-emagrecer{color:#ffc2d3;border-color:rgba(255,92,138,.4);background:rgba(255,92,138,.1)}
+.tag.g-massa{color:#9befff;border-color:rgba(34,211,238,.4);background:rgba(34,211,238,.1)}
+.tag.g-hipertrofia{color:#d8c7ff;border-color:rgba(139,92,246,.45);background:rgba(139,92,246,.12)}
 /* ajustes para a fonte técnica, que é mais larga */
 .hero h1{font-size:clamp(2.1rem,10vw,3rem);line-height:.95;overflow-wrap:normal}
 .big b{font-size:clamp(3.4rem,17vw,4.6rem)}
@@ -720,6 +761,7 @@ async function init(){
   if (location.hash === '#corpo') view = 'body';
   if (location.hash === '#treino') view = 'today';
   if (location.hash === '#saude') view = 'health';
+  if (location.hash === '#plano'){ view = 'plan'; fGoal = null; setTimeout(loadTemplates); }
   if (plan) loaded = true;
   render();
   let d = null;
@@ -925,7 +967,7 @@ function plateSVG(done, n){
     <text x="60" y="61" text-anchor="middle" dominant-baseline="middle" font-family="Chakra Petch, Arial Narrow, sans-serif" font-weight="900" font-size="22" fill="var(--iron-fg)">${done}/${n}</text></svg>`;
 }
 function renderNav(){
-  const nav = $('#nav'), show = view === 'today' || view === 'body' || view === 'prog' || view === 'health';
+  const nav = $('#nav'), show = view === 'today' || view === 'body' || view === 'prog' || view === 'health' || view === 'plan';
   nav.hidden = !show; $('#app').classList.toggle('nonav', !show);
   if (!show) return;
   nav.innerHTML = `<div class="nav-in">
@@ -933,7 +975,7 @@ function renderNav(){
     <button data-act="tab" data-v="today" ${view==='today'?'aria-current="page"':''}>${icon.dumbbell}<span>Treino</span></button>
     <button data-act="tab" data-v="health" ${view==='health'?'aria-current="page"':''}>${icon.drop}<span>Saúde</span></button>
     <button data-act="tab" data-v="body" ${view==='body'?'aria-current="page"':''}>${icon.body}<span>Corpo</span></button>
-    <button data-act="edit">${icon.list}<span>Plano</span></button></div>`;
+    <button data-act="tab" data-v="plan" ${view==='plan'?'aria-current="page"':''}>${icon.list}<span>Plano</span></button></div>`;
 }
 let guideOpen = false;
 document.addEventListener('toggle', e => { if (e.target.classList && e.target.classList.contains('guide')) guideOpen = e.target.open; }, true);
@@ -955,7 +997,7 @@ function topbar(noAcct){
 function render(){
   renderNav();
   if (view === 'login') return renderLogin();
-  if (view === 'templates') return renderTemplates();
+  if (view === 'templates' || view === 'plan') return renderPlanConfig();
   if (view === 'edit') return renderEditor();
   if (view === 'body') return renderBody();
   if (view === 'prog') return renderProg();
@@ -1078,7 +1120,7 @@ function renderEditor(){
   const p = draft;
   $('#app').innerHTML = `<div class="head"><span class="eyebrow">Editar plano</span><h1>Seus treinos</h1>
     <p class="muted" style="margin:0">Escolha o treino de cada dia da semana e monte os exercícios de cada treino. No campo de vídeo, cole um link do YouTube se quiser um vídeo específico. Sem link, o app abre a busca do exercício.</p></div>
-    <button class="btn wide" data-act="templates">Trocar tudo por um modelo pronto</button>
+    <button class="btn wide" data-act="templates">Trocar tudo por um modelo pronto (com filtros)</button>
     <section class="sched" id="sched"></section>
     ${p.days.map((d,di) => `<section class="ed-day" style="${pcOf(d, p)}">
       <div class="row" style="flex-wrap:nowrap"><label class="field" style="flex:1"><span>Nome</span><input id="d${di}-label" data-d="${di}" data-f="label" value="${esc(d.label)}" placeholder="Treino A"></label>
@@ -1465,10 +1507,10 @@ function dietCard(){
   const myDiet = plan && plan.guide && plan.guide.diet;
   const notes = (profile && profile.dietNotes) || '';
   return `<div class="card diet"><div class="card-top"><h2>Dieta</h2><span class="pill">${esc(gName)}</span></div>
-      ${w ? `<div class="stat3">
-        <div><small>Proteína/dia</small><b>${pLo}–${pHi}<i>g</i></b><em>1,6 a 2 g por kg</em></div>
-        <div><small>Por refeição</small><b>${Math.round(pLo/4)}–${Math.round(pHi/4)}<i>g</i></b><em>em 4 refeições</em></div>
-        <div><small>Água</small><b>${(waterGoal()/1000).toLocaleString('pt-BR',{maximumFractionDigits:1})}<i>L</i></b><em>meta de hoje</em></div></div>
+      ${w ? `<div class="dstats">
+        <div class="ds-main"><div><small>Proteína por dia</small><em>1,6 a 2 g por kg · ${fmt(w)} kg</em></div><b>${pLo}–${pHi}<i>g</i></b></div>
+        <div class="ds"><small>Por refeição</small><b>${Math.round(pLo/4)}–${Math.round(pHi/4)}<i>g</i></b><em>dividindo em 4</em></div>
+        <div class="ds water"><small>Água hoje</small><b>${(waterGoal()/1000).toLocaleString('pt-BR',{maximumFractionDigits:1})}<i>L</i></b><em>meta pelo peso</em></div></div>
         <p class="muted" style="margin:0;font-size:.8rem">Exemplos com ~30 g de proteína: 120 g de frango ou carne, 5 ovos, 1 lata de atum, 1 dose de whey + 1 iogurte.</p>`
       : '<p class="muted" style="margin:0">Registre seu peso na aba Corpo para ver a sua meta de proteína.</p>'}
       <div><div class="lbl">Dicas para ${esc(gName.toLowerCase())}</div><ul class="g-list">${DIET_TIPS[g].map(t => `<li>${esc(t)}</li>`).join('')}</ul>
@@ -1774,6 +1816,81 @@ function commitProfile(){
 }
 function closeSheet(){ tplOpen = null; tplConfirm = false; vidEdit = false; openId = null; openEntry = null; confirmMDel = false; $('#sheet').hidden = true; }
 
+/* ---------- configurações do plano (com filtros de modelos) ---------- */
+let fGoal = null, fDays = 'all', fLevel = 'all', newConfirm = false;
+const LEVELS = [['all','Todos'],['iniciante','Iniciante'],['intermediário','Intermediário'],['avançado','Avançado']];
+async function loadTemplates(){
+  if (tplData) return;
+  try { tplData = await (await fetch('templates.json', {cache:'no-cache'})).json(); tplErr = false; }
+  catch(e){ tplErr = true; }
+  if (view === 'plan') render();
+}
+function openPlanConfig(scrollToModels){
+  view = 'plan'; draft = null; newConfirm = false;
+  if (!fGoal) fGoal = goalFromProfile();
+  render();
+  if (scrollToModels){ const m = $('#models'); if (m) m.scrollIntoView({block:'start'}); } else window.scrollTo(0,0);
+  loadTemplates();
+}
+function filteredTemplates(){
+  if (!tplData) return [];
+  return tplData.templates.filter(t =>
+    (fGoal === 'all' || t.goal === fGoal) &&
+    (fDays === 'all' || (fDays === '6' ? t.perWeek >= 6 : t.perWeek === +fDays)) &&
+    (fLevel === 'all' || t.level.toLowerCase().includes(fLevel)));
+}
+function filterRow(label, act, cur, opts){
+  return `<div class="flt"><span class="flt-l">${esc(label)}</span><div class="chips flt-c" role="group" aria-label="${esc(label)}">${opts.map(([v, n]) =>
+    `<button class="chip" data-act="${act}" data-v="${v}" aria-pressed="${String(v) === String(cur)}"><b>${esc(n)}</b></button>`).join('')}</div></div>`;
+}
+function renderPlanConfig(){
+  if (!fGoal) fGoal = goalFromProfile();
+  if (!tplData && !tplErr) setTimeout(loadTemplates);
+  const app = $('#app'), hasPlan = plan && plan.days && plan.days.length;
+  const wd = d => (d.weekdays || []).slice().sort((a,b) => ((a+6)%7) - ((b+6)%7)).map(w => WD[w]).join(', ') || 'sem dia';
+  const nEx = hasPlan ? plan.days.reduce((s, d) => s + d.exercises.length, 0) : 0;
+  const current = hasPlan ? `<section class="hero plan-cur" style="--pc:var(--accent)">
+      <span class="eyebrow">Plano atual</span><h1>${esc(plan.name || 'Meu plano')}</h1>
+      <div class="hero-meta"><span>${plan.days.length} treino${plan.days.length === 1 ? '' : 's'}</span><span>${weekGoal()}x por semana</span><span>${nEx} exercícios</span></div>
+      <div class="pc-days">${plan.days.map(d => `<span class="pc-day" style="${pcOf(d)}"><i>${esc(badgeOf(d))}</i><span><b>${esc(d.label)}${d.focus ? ' · ' + esc(d.focus) : ''}</b><small>${esc(wd(d))}</small></span></span>`).join('')}</div>
+    </section>`
+    : `<section class="hero plan-cur" style="--pc:var(--accent)"><span class="eyebrow">Plano atual</span><h1>Nenhum plano</h1>
+      <p class="focus" style="margin:0">Escolha um modelo pronto abaixo ou crie o seu do zero.</p></section>`;
+  const list = filteredTemplates();
+  const goals = [['all','Todos'],['emagrecer','Emagrecer'],['massa','Massa magra'],['hipertrofia','Hipertrofia']];
+  const days = [['all','Todos'],['3','3x'],['4','4x'],['5','5x'],['6','6x']];
+  app.innerHTML = `${topbar()}
+    <div class="head"><span class="eyebrow">Configurações</span><h1>Plano de treino</h1></div>
+    ${current}
+    <div class="card"><h2>Ajustar o plano atual</h2>
+      <div class="cfg-list">
+        <button class="cfg" data-act="edit" ${hasPlan ? '' : 'disabled'}><span class="cfg-i">${icon.list}</span><span><b>Editar treinos e exercícios</b><small>Séries, repetições, descanso, carga e vídeos</small></span><span class="go2">›</span></button>
+        <button class="cfg" data-act="sched" ${hasPlan ? '' : 'disabled'}><span class="cfg-i">${icon.chart}</span><span><b>Montar a semana</b><small>Qual treino em cada dia, de segunda a domingo</small></span><span class="go2">›</span></button>
+        <button class="cfg" data-act="newplan"><span class="cfg-i">${icon.dumbbell}</span><span><b>${newConfirm ? 'Toque de novo para começar do zero' : 'Criar um plano do zero'}</b><small>${hasPlan ? 'Substitui o plano atual por um em branco' : 'Monte seus próprios treinos'}</small></span><span class="go2">›</span></button>
+        <button class="cfg" data-act="account"><span class="cfg-i">${icon.down}</span><span><b>Backup do plano</b><small>Baixar ou restaurar plano, treinos e medidas</small></span><span class="go2">›</span></button>
+      </div></div>
+    <div class="card" id="models"><div class="card-top"><h2>Trocar por um modelo</h2>${tplData ? `<span class="pill">${list.length} de ${tplData.templates.length}</span>` : ''}</div>
+      <div class="filters">
+        ${filterRow('Objetivo', 'fgoal', fGoal, goals)}
+        ${filterRow('Dias por semana', 'fdays', fDays, days)}
+        ${filterRow('Nível', 'flevel', fLevel, LEVELS)}
+        ${fGoal !== 'all' || fDays !== 'all' || fLevel !== 'all' ? '<button class="btn ghost" data-act="fclear" style="align-self:flex-start;padding:4px 0">Limpar filtros</button>' : ''}
+      </div>
+      ${tplErr ? '<p class="note">Não deu para carregar os modelos. Confira a internet e tente de novo.</p>'
+        : !tplData ? '<p class="muted" style="margin:0">Carregando modelos…</p>'
+        : !list.length ? '<p class="muted" style="margin:0">Nenhum modelo com esses filtros. Tente outra combinação ou limpe os filtros.</p>'
+        : `<div class="tpl-list">${list.map(t => `
+          <button class="tpl" data-act="tplopen" data-id="${esc(t.id)}">
+            <span class="tpl-top"><b>${esc(t.split)}</b><span class="pill">${t.perWeek}x por semana</span></span>
+            <span class="tpl-tags"><span class="tag g-${t.goal}">${esc(t.goalName)}</span><span class="tag">${esc(t.level)}</span></span>
+            <span class="tpl-desc">${esc(t.desc)}</span>
+            <span class="tpl-days">${t.plan.days.map(d => `<span class="tpl-day" style="${pcOf(d, t.plan)}"><i>${esc(badgeOf(d))}</i>${esc(d.focus)}</span>`).join('')}</span>
+          </button>`).join('')}</div>`}
+    </div>
+    <div class="foot"><small>Trocar de modelo substitui o plano atual. Seus treinos já feitos, cargas e gráficos continuam salvos.</small></div>`;
+  if (tplOpen) renderTplSheet();
+}
+
 /* ---------- modelos de treino ---------- */
 let tplData = null, tplGoal = null, tplOpen = null, tplConfirm = false, tplErr = false;
 function goalFromProfile(){
@@ -2027,7 +2144,8 @@ document.addEventListener('click', ev => {
   const a = b.dataset.act, id = b.dataset.id, di = +b.dataset.d, ei = +b.dataset.e;
   if (a === 'tab'){
     closeSheet(); view = b.dataset.v; viewDayId = null;
-    try { location.hash = view === 'body' ? 'corpo' : view === 'prog' ? 'inicio' : view === 'health' ? 'saude' : 'treino'; } catch(e){}
+    try { location.hash = view === 'body' ? 'corpo' : view === 'prog' ? 'inicio' : view === 'health' ? 'saude' : view === 'plan' ? 'plano' : 'treino'; } catch(e){}
+    if (view === 'plan'){ newConfirm = false; if (!fGoal) fGoal = goalFromProfile(); loadTemplates(); }
     render(); window.scrollTo(0,0); return;
   }
   if (a === 'play'){ if (openPlayer(b.dataset.url, b.dataset.label)) ev.preventDefault(); return; }
@@ -2050,8 +2168,13 @@ document.addEventListener('click', ev => {
   if (a === 'install'){ doInstall(); return; }
   if (a === 'install-hide'){ try { localStorage.setItem('treino:installHide', String(Date.now())); } catch(e){} render(); return; }
   if (a === 'copyurl'){ const i = $('#in-url'); const done = () => toast('Endereço copiado'); if (navigator.clipboard) navigator.clipboard.writeText(i.value).then(done, () => { i.select(); }); else { i.select(); document.execCommand && document.execCommand('copy'); done(); } return; }
-  if (a === 'templates'){ draft = null; openTemplates(); return; }
-  if (a === 'tplback'){ view = 'today'; render(); window.scrollTo(0,0); return; }
+  if (a === 'templates'){ openPlanConfig(true); return; }
+  if (a === 'fgoal'){ fGoal = b.dataset.v; render(); return; }
+  if (a === 'fdays'){ fDays = b.dataset.v; render(); return; }
+  if (a === 'flevel'){ fLevel = b.dataset.v; render(); return; }
+  if (a === 'fclear'){ fGoal = 'all'; fDays = 'all'; fLevel = 'all'; render(); return; }
+  if (a === 'newplan'){ if (newConfirm || !(plan && plan.days && plan.days.length)){ newConfirm = false; openEditor({name:'Meu plano', days:[blankDay(0)]}); } else { newConfirm = true; render(); } return; }
+  if (a === 'tplback'){ openPlanConfig(); return; }
   if (a === 'tplgoal'){ tplGoal = b.dataset.g; render(); return; }
   if (a === 'tplopen'){ tplOpen = b.dataset.id; tplConfirm = false; renderTplSheet(); return; }
   if (a === 'tpluse'){ if (tplConfirm) applyTemplate(); else { tplConfirm = true; renderTplSheet(); } return; }
@@ -2116,7 +2239,7 @@ document.addEventListener('click', ev => {
   else if (a === 'edit') openEditor();
   else if (a === 'new') openEditor({name:'Meu plano', days:[blankDay(0)]});
   else if (a === 'example'){ plan = clone(EXAMPLE); savePlan(); render(); }
-  else if (a === 'cancel'){ draft = null; view = 'today'; render(); }
+  else if (a === 'cancel'){ draft = null; view = 'plan'; render(); window.scrollTo(0,0); }
   else if (a === 'saveplan') commitEditor();
   else if (a === 'wd'){ const d = draft.days[di], w = +b.dataset.w; d.weekdays = d.weekdays || []; d.weekdays = d.weekdays.includes(w) ? d.weekdays.filter(x=>x!==w) : d.weekdays.concat(w); b.setAttribute('aria-pressed', d.weekdays.includes(w)); }
   else if (a === 'addex'){ draft.days[di].exercises.push(blankEx()); confirmDel = null; renderEditor(); }
