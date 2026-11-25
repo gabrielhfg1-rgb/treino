@@ -145,7 +145,7 @@ h2{font-size:1.6rem}
 /* navegação inferior */
 .nav{position:fixed;left:0;right:0;bottom:0;z-index:15;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);
   padding:6px max(16px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
-.nav-in{max-width:460px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.nav-in{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);gap:2px}
 /* calendário de treinos */
 .hm-wrap{display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:stretch}
 .hm-days{display:grid;grid-template-rows:repeat(7,1fr);gap:3px}
@@ -564,6 +564,43 @@ h1,h2,h3{font-weight:700;letter-spacing:.02em}
 .meta-row .unit{flex:1;min-width:0}
 .meta-hint{color:var(--muted);font-size:.76rem;line-height:1.4}
 .meta-prev{margin:4px 0 0;padding:9px 12px;border-radius:12px;background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.3);color:#bff6ff;font-size:.84rem;line-height:1.4}
+/* início e saúde */
+.home-quick{display:grid;grid-template-columns:1fr;gap:10px}
+.today-mini{flex-direction:row;align-items:center;gap:12px;padding:14px 14px 14px 16px;border-left:3px solid var(--pc,var(--accent))}
+.today-mini > div{flex:1;display:flex;flex-direction:column;gap:2px}
+.today-mini b{font-family:var(--display);font-size:1.1rem;letter-spacing:.02em}
+.today-mini small{color:var(--muted);font-size:.8rem}
+.today-mini .btn{padding:10px 14px;flex:none}
+.tm-badge{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;flex:none;background:var(--pc);color:var(--pf);font-family:var(--display);font-weight:700;box-shadow:0 0 16px color-mix(in srgb,var(--pc) 60%,transparent)}
+.water-mini{flex-direction:row;align-items:center;gap:12px;padding:12px 14px;border-left:3px solid #38bdf8}
+.wm-ring{width:58px;height:58px;flex:none}
+.wm-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.wm-t b{font-family:var(--display);font-size:1.15rem}
+.wm-t b i{font-style:normal;font-size:.8rem;color:var(--muted);font-family:var(--body)}
+.wm-t small{color:var(--muted);font-size:.78rem}
+.wm-btn,.water-btn{background:linear-gradient(120deg,#38bdf8,#22d3ee)!important;color:#02121a!important;text-shadow:none!important}
+.wm-btn{padding:10px 12px;flex:none;gap:4px}
+.wm-btn svg,.water-btn svg{width:16px;height:16px}
+.water-hero h1{background:linear-gradient(180deg,#fff 20%,#7dd3fc);-webkit-background-clip:text;background-clip:text;color:transparent}
+.cups{display:flex;flex-wrap:wrap;gap:6px}
+.cup{width:26px;height:30px;display:grid;place-items:center;color:rgba(125,211,252,.22)}
+.cup svg{width:22px;height:22px}
+.cup.on{color:#38bdf8;filter:drop-shadow(0 0 6px rgba(56,189,248,.8))}
+.calc{display:flex;flex-direction:column;gap:6px;padding:12px 14px;border-radius:14px;background:rgba(56,189,248,.07);border:1px solid rgba(56,189,248,.28)}
+.calc p{margin:0;line-height:1.5}
+.calc b{color:#bae6fd}
+.wweek{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;align-items:end}
+.wd-col{display:flex;flex-direction:column;align-items:center;gap:4px}
+.wd-bar{position:relative;width:100%;max-width:30px;height:90px;border-radius:10px;background:rgba(56,189,248,.08);overflow:hidden;display:flex;align-items:flex-end}
+.wd-bar i{display:block;width:100%;border-radius:10px;background:linear-gradient(0deg,rgba(56,189,248,.45),rgba(56,189,248,.8))}
+.wd-bar i.ok{background:linear-gradient(0deg,#0ea5e9,#7dd3fc);box-shadow:0 0 12px rgba(56,189,248,.7)}
+.wd-col b{font-family:var(--display);font-size:.8rem}
+.wd-col small{font-size:.66rem;color:var(--muted);text-transform:uppercase;font-weight:700}
+.wd-col.now small{color:#7dd3fc}
+.diet-ta{width:100%;min-height:110px;border:1px solid var(--line);background:rgba(5,7,18,.6);color:var(--fg);border-radius:12px;padding:10px 12px;font:inherit;resize:vertical}
+.diet-notes{padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
+@media (min-width:520px){.home-quick{grid-template-columns:1fr 1fr}}
+.nav button{padding:8px 2px;font-size:.66rem}
 /* ajustes para a fonte técnica, que é mais larga */
 .hero h1{font-size:clamp(2.1rem,10vw,3rem);line-height:.95;overflow-wrap:normal}
 .big b{font-size:clamp(3.4rem,17vw,4.6rem)}
@@ -612,7 +649,7 @@ const EXAMPLE = {"name":"Plano de exemplo","example":true,"days":[
 ]};
 
 let plan = null, log = {sets:{}}, db = null, mode = 'starting', loaded = false, slow = false;
-let view = 'today', viewDayId = null, draft = null, openId = null, confirmDel = null;
+let view = 'prog', viewDayId = null, draft = null, openId = null, confirmDel = null;
 const today = new Date();
 const logKey = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
 
@@ -626,6 +663,7 @@ const icon = {
   x:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
   up:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>',
   down:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
+  drop:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3C9.2 7.2 6 10.6 6 14.3a6 6 0 0 0 12 0C18 10.6 14.8 7.2 12 3z"/><path d="M9.5 15a2.5 2.5 0 0 0 2.5 2.5" stroke-linecap="round"/></svg>',
   chart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5h16"/><path d="M4.5 15l4.5-5 4 3 6.5-7.5"/><path d="M15.5 5.5h4v4"/></svg>',
   dumbbell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg>',
   body:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M8 9.5a5 5 0 0 1 8 0l-2.2 2.2"/><path d="M8 15.5h8"/></svg>',
@@ -678,8 +716,10 @@ async function init(){
   trainLog = local.get('history') || {};
   if (log && setsOf(log) > 0) trainLog[logKey] = log; else if (trainLog[logKey]) log = trainLog[logKey];
   if (!log.sets) log.sets = {};
+  waterLog = local.get('water') || {};
   if (location.hash === '#corpo') view = 'body';
-  if (location.hash === '#progresso') view = 'prog';
+  if (location.hash === '#treino') view = 'today';
+  if (location.hash === '#saude') view = 'health';
   if (plan) loaded = true;
   render();
   let d = null;
@@ -700,16 +740,23 @@ async function init(){
     if (s.exists){ plan = clone(s.data()); local.set('plan/current', plan); }
     else if (!s.metadata.fromCache && !plan) plan = null;
     loaded = true;
-    if (view === 'today') render();
+    if (view === 'today' || view === 'prog' || view === 'health') render();
   }, () => { clearTimeout(t); mode = 'local'; loaded = true; render(); });
   db.doc('profile/me').onSnapshot(s => {
-    if (s.exists && !s.metadata.hasPendingWrites){ profile = clone(s.data()); local.set('profile/me', profile); if (view === 'body') render(); }
+    if (s.exists && !s.metadata.hasPendingWrites){ profile = clone(s.data()); local.set('profile/me', profile); if (view === 'body' || view === 'health' || view === 'prog') render(); }
   }, () => {});
   db.collection('measures').onSnapshot(s => {
     if (s.metadata.hasPendingWrites) return;
     if (s.metadata.fromCache && s.empty) return;
     measures = s.docs.map(d => Object.assign(clone(d.data()), {id:d.id})); sortM(); local.set('measures', measures);
-    if (view === 'body') render();
+    if (view === 'body' || view === 'health' || view === 'prog') render();
+  }, () => {});
+  db.collection('water').onSnapshot(s => {
+    if (s.metadata.hasPendingWrites) return;
+    if (s.metadata.fromCache && s.empty) return;
+    const h = {}; s.docs.forEach(d => { h[d.id] = clone(d.data()); });
+    waterLog = h; local.set('water', waterLog);
+    if (view === 'health' || view === 'prog') render();
   }, () => {});
   db.collection('logs').onSnapshot(s => {
     if (s.metadata.hasPendingWrites) return;
@@ -878,12 +925,13 @@ function plateSVG(done, n){
     <text x="60" y="61" text-anchor="middle" dominant-baseline="middle" font-family="Chakra Petch, Arial Narrow, sans-serif" font-weight="900" font-size="22" fill="var(--iron-fg)">${done}/${n}</text></svg>`;
 }
 function renderNav(){
-  const nav = $('#nav'), show = view === 'today' || view === 'body' || view === 'prog';
+  const nav = $('#nav'), show = view === 'today' || view === 'body' || view === 'prog' || view === 'health';
   nav.hidden = !show; $('#app').classList.toggle('nonav', !show);
   if (!show) return;
   nav.innerHTML = `<div class="nav-in">
+    <button data-act="tab" data-v="prog" ${view==='prog'?'aria-current="page"':''}>${icon.chart}<span>Início</span></button>
     <button data-act="tab" data-v="today" ${view==='today'?'aria-current="page"':''}>${icon.dumbbell}<span>Treino</span></button>
-    <button data-act="tab" data-v="prog" ${view==='prog'?'aria-current="page"':''}>${icon.chart}<span>Progresso</span></button>
+    <button data-act="tab" data-v="health" ${view==='health'?'aria-current="page"':''}>${icon.drop}<span>Saúde</span></button>
     <button data-act="tab" data-v="body" ${view==='body'?'aria-current="page"':''}>${icon.body}<span>Corpo</span></button>
     <button data-act="edit">${icon.list}<span>Plano</span></button></div>`;
 }
@@ -911,6 +959,7 @@ function render(){
   if (view === 'edit') return renderEditor();
   if (view === 'body') return renderBody();
   if (view === 'prog') return renderProg();
+  if (view === 'health') return renderHealth();
   if (view === 'bform') return renderBForm();
   if (view === 'profile') return renderProfile();
   const app = $('#app');
@@ -981,7 +1030,6 @@ function renderSheet(){
   el.innerHTML = `<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-t" style="${pcOf(dOf)}">
     <div class="grab"></div>
     <div class="sheet-top"><div style="min-width:0"><span class="eyebrow">${esc(dOf ? dOf.label : '')}${idx ? ' · exercício ' + idx + ' de ' + dOf.exercises.length : ''}</span><h2 id="sh-t" style="margin-top:6px">${esc(ex.name)}</h2></div><button class="x" data-act="close" aria-label="Fechar">${icon.x}</button></div>
-    ${videoBlock(ex)}
     <div class="stats">
       <div class="stat"><small>Séries</small><b>${ex.sets||0}</b></div>
       <div class="stat"><small>Reps</small><b>${esc(ex.reps||'—')}</b></div>
@@ -991,6 +1039,8 @@ function renderSheet(){
     <div><div class="lbl">Séries feitas hoje</div><div class="sets">${Array.from({length:ex.sets||0},(_,i)=>`<button class="set${i<sd?' on':''}" data-act="set" data-n="${i+1}" aria-label="Série ${i+1}">${i+1}</button>`).join('')}</div></div>
     ${ex.rest ? `<div><div class="lbl">Descanso</div><div class="timer${timer.iv?' running':''}${timer.over?' over':''}" id="sh-timer"><span class="clock" id="sh-clock">${clockText(ex)}</span>
       <button class="btn ${timer.iv?'':'primary'}" data-act="timer">${timer.iv ? 'Parar' : 'Iniciar'}</button></div></div>` : ''}
+    <div class="lbl" style="margin:4px 0 -6px">Vídeos de execução</div>
+    ${videoBlock(ex)}
     ${ex.notes ? `<div><div class="lbl">Como fazer</div><p class="notes">${esc(ex.notes)}</p></div>` : ''}
   </div>`;
   el.hidden = false;
@@ -1318,6 +1368,132 @@ function chartSVG(k){
   return lineChart('chart', pts, FIELD[k].unit, FIELD[k].label);
 }
 
+/* ---------- saúde: água e dieta ---------- */
+let waterLog = {}, dietEdit = false;
+const CUPS = [200, 250, 300, 350, 500];
+function cupSize(){ const c = profile && num(profile.waterCup); return c && c >= 50 && c <= 2000 ? c : 200; }
+function weightForCalc(){ return currentWeight(); }
+function trainsToday(){ return !!todayDay(); }
+function waterGoal(){ // ml por dia: 35 ml por kg + 500 ml em dia de treino
+  const w = weightForCalc();
+  const base = w ? Math.round(w * 35 / 50) * 50 : 2500;
+  return base + (trainsToday() ? 500 : 0);
+}
+function waterToday(){ const d = waterLog[logKey]; return d ? (d.drinks || []).reduce((s, x) => s + (+x || 0), 0) : 0; }
+const fmtL = ml => (ml / 1000).toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 2}) + ' L';
+function saveWater(){ local.set('water', waterLog); save('water/' + logKey, waterLog[logKey]); }
+function drink(ml){
+  const d = waterLog[logKey] = waterLog[logKey] || {drinks: []};
+  d.drinks = (d.drinks || []).concat(ml); d.ml = d.drinks.reduce((s, x) => s + x, 0);
+  saveWater();
+  const got = waterToday(), goal = waterGoal();
+  toast(got >= goal && got - ml < goal ? 'Meta de água batida! 💧' : '+' + ml + ' ml · ' + fmtL(got) + ' de ' + fmtL(goal));
+}
+function undoDrink(){
+  const d = waterLog[logKey]; if (!d || !(d.drinks || []).length) return;
+  d.drinks = d.drinks.slice(0, -1); d.ml = d.drinks.reduce((s, x) => s + x, 0);
+  saveWater(); toast('Último copo removido');
+}
+function waterRing(got, goal, size){
+  const r = 44, C = 2*Math.PI*r, f = Math.min(1, goal ? got/goal : 0);
+  return `<svg viewBox="0 0 120 120" class="ring-svg" aria-hidden="true">
+    <defs><linearGradient id="wa-st" x1="0" x2="1"><stop offset="0" stop-color="#38bdf8"/><stop offset="1" stop-color="#22d3ee"/></linearGradient>
+    <filter id="wa-gl" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+    <circle cx="60" cy="60" r="${r}" fill="none" stroke="rgba(56,189,248,.14)" stroke-width="10"/>
+    ${f > 0 ? `<circle cx="60" cy="60" r="${r}" fill="none" stroke="url(#wa-st)" stroke-width="10" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C*(1-f)).toFixed(1)}" transform="rotate(-90 60 60)" filter="url(#wa-gl)"/>` : ''}
+    <text x="60" y="${size === 'sm' ? 66 : 58}" text-anchor="middle" font-family="Chakra Petch, sans-serif" font-weight="700" font-size="${size === 'sm' ? 22 : 24}" fill="#eaf8ff">${Math.round(f*100)}%</text>
+    ${size === 'sm' ? '' : `<text x="60" y="78" text-anchor="middle" font-size="9.5" font-weight="700" fill="#7dd3fc" letter-spacing=".14em">DA META</text>`}
+  </svg>`;
+}
+function waterWeek(){
+  const out = [];
+  for (let i = 6; i >= 0; i--){ const d = new Date(today); d.setDate(today.getDate() - i); const k = keyOf(d); const w = waterLog[k]; out.push({k, d, ml: w ? (w.drinks || []).reduce((s,x) => s + x, 0) : 0}); }
+  return out;
+}
+const DROP = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5C9 7 5.5 10.6 5.5 14.5a6.5 6.5 0 0 0 13 0C18.5 10.6 15 7 12 2.5z" fill="currentColor"/></svg>';
+function waterCard(compact){
+  const got = waterToday(), goal = waterGoal(), cup = cupSize(), w = weightForCalc();
+  const nCups = Math.ceil(goal / cup), done = Math.floor(got / cup + 1e-9);
+  if (compact){
+    return `<div class="card water-mini"><div class="wm-ring">${waterRing(got, goal, 'sm')}</div>
+      <div class="wm-t"><span class="eyebrow">Água hoje</span><b>${fmtL(got)} <i>de ${fmtL(goal)}</i></b><small>${got >= goal ? 'Meta batida! 💧' : 'Faltam ' + fmtL(goal - got) + ' · ' + Math.ceil((goal - got) / cup) + ' copo' + (Math.ceil((goal - got) / cup) === 1 ? '' : 's')}</small></div>
+      <button class="btn primary wm-btn" data-act="drink" aria-label="Bebi um copo de ${cup} ml">${DROP}+${cup}</button></div>`;
+  }
+  const week = waterWeek(), maxW = Math.max(goal, ...week.map(x => x.ml));
+  return `<section class="hero water-hero" style="--pc:#38bdf8">
+      <div class="prog-top"><div style="min-width:0"><span class="eyebrow">Hidratação · hoje</span>
+        <h1>${fmtL(got)}</h1><p class="focus" style="margin:0">de ${fmtL(goal)} · ${got >= goal ? 'meta batida! 💧' : 'faltam ' + fmtL(goal - got)}</p></div>
+        <div class="ring">${waterRing(got, goal)}</div></div>
+      <button class="btn primary wide water-btn" data-act="drink">${DROP} Bebi um copo de ${cup} ml</button>
+      <div class="cups" aria-label="${done} de ${nCups} copos">${Array.from({length: nCups}, (_, i) => `<i class="cup${i < done ? ' on' : ''}">${DROP}</i>`).join('')}</div>
+      <div class="row" style="justify-content:space-between;align-items:center"><small class="muted" style="color:var(--iron-muted)">${done} de ${nCups} copos de ${cup} ml</small>
+        ${got ? '<button class="btn ghost" data-act="undodrink" style="padding:6px 8px">Desfazer último</button>' : ''}</div>
+    </section>
+    <div class="card"><div class="card-top"><h2>Seu copo</h2><span class="pill">${cup} ml</span></div>
+      <div class="chips" role="group" aria-label="Tamanho do copo">${CUPS.map(c => `<button class="chip" data-act="cup" data-ml="${c}" aria-pressed="${c === cup}"><b>${c} ml</b></button>`).join('')}</div>
+      <div class="vid-row"><input id="cup-custom" inputmode="numeric" placeholder="Outro tamanho (ml)" aria-label="Outro tamanho de copo em ml"><button class="btn dark" data-act="cupcustom">Usar</button></div>
+      <div class="calc"><span class="lbl" style="margin:0">Como a meta é calculada</span>
+        <p>${w ? `<b>35 ml × ${fmt(w)} kg</b> = ${fmtL(Math.round(w * 35 / 50) * 50)}` : 'Registre seu peso na aba Corpo para a meta ficar exata. Por enquanto: <b>2,5 L</b>'}${trainsToday() ? ` <b>+ 500 ml</b> porque hoje tem treino = <b>${fmtL(goal)}</b>` : ''} por dia.</p>
+        <small class="muted">Em dias muito quentes ou de cardio longo, beba um pouco mais. Quem tem problema nos rins ou no coração deve seguir a orientação do médico.</small></div>
+    </div>
+    <div class="card"><h2>Últimos 7 dias</h2>
+      <div class="wweek">${week.map(x => `<div class="wd-col${x.k === logKey ? ' now' : ''}"><span class="wd-bar"><i style="height:${Math.round(Math.min(1, x.ml / maxW) * 100)}%" class="${x.ml >= goal ? 'ok' : ''}"></i></span><b>${x.ml ? (x.ml/1000).toLocaleString('pt-BR', {maximumFractionDigits:1}) : '–'}</b><small>${WD[x.d.getDay()]}</small></div>`).join('')}</div>
+      <small class="muted">Litros por dia. Barras cheias de azul-claro = meta batida.</small></div>`;
+}
+const DIET_TIPS = {
+  emagrecer: ['Coma um pouco menos do que gasta: corte açúcar, frituras, refrigerante e álcool antes de cortar comida de verdade.',
+    'Monte o prato assim: metade de salada e legumes, um quarto de proteína (carne, frango, peixe, ovos) e um quarto de carboidrato (arroz, batata, mandioca).',
+    'Proteína em todas as refeições segura a fome e protege os músculos enquanto você perde gordura.',
+    'Prefira frutas inteiras a sucos, e beba água antes das refeições.',
+    'Planeje lanches (fruta, iogurte natural, ovos, castanhas) para não chegar com muita fome no jantar.',
+    'Não precisa ser perfeito: acerte em 80% das refeições e mantenha por semanas.'],
+  massa: ['Coma perto do que você gasta, com proteína alta: ganha músculo sem acumular gordura.',
+    'Distribua a proteína em 4 a 5 refeições ao longo do dia.',
+    'Carboidrato antes e depois do treino (arroz, batata, aveia, frutas) ajuda no rendimento e na recuperação.',
+    'Inclua gorduras boas: azeite, abacate, castanhas, ovos.',
+    'Pese-se 1 vez por semana: se subir muito rápido, reduza um pouco o carboidrato.'],
+  hipertrofia: ['Coma um pouco acima do que gasta (sobra de 200 a 400 kcal por dia): sem isso o músculo cresce pouco.',
+    'Proteína alta todos os dias e uma refeição com proteína e carboidrato até 2 horas depois do treino.',
+    'Não pule refeições: 4 a 6 refeições facilitam bater as calorias.',
+    'Carboidratos são combustível do treino pesado: arroz, massas, batata, pão, aveia, frutas.',
+    'Ganho saudável: de 0,25 a 0,5 kg por semana. Mais que isso costuma ser gordura.'],
+};
+function dietCard(){
+  const g = goalFromProfile(), w = weightForCalc();
+  const gName = {emagrecer:'Emagrecer', massa:'Massa magra', hipertrofia:'Hipertrofia'}[g];
+  const pLo = w ? Math.round(w * 1.6) : null, pHi = w ? Math.round(w * 2) : null;
+  const myDiet = plan && plan.guide && plan.guide.diet;
+  const notes = (profile && profile.dietNotes) || '';
+  return `<div class="card diet"><div class="card-top"><h2>Dieta</h2><span class="pill">${esc(gName)}</span></div>
+      ${w ? `<div class="stat3">
+        <div><small>Proteína/dia</small><b>${pLo}–${pHi}<i>g</i></b><em>1,6 a 2 g por kg</em></div>
+        <div><small>Por refeição</small><b>${Math.round(pLo/4)}–${Math.round(pHi/4)}<i>g</i></b><em>em 4 refeições</em></div>
+        <div><small>Água</small><b>${(waterGoal()/1000).toLocaleString('pt-BR',{maximumFractionDigits:1})}<i>L</i></b><em>meta de hoje</em></div></div>
+        <p class="muted" style="margin:0;font-size:.8rem">Exemplos com ~30 g de proteína: 120 g de frango ou carne, 5 ovos, 1 lata de atum, 1 dose de whey + 1 iogurte.</p>`
+      : '<p class="muted" style="margin:0">Registre seu peso na aba Corpo para ver a sua meta de proteína.</p>'}
+      <div><div class="lbl">Dicas para ${esc(gName.toLowerCase())}</div><ul class="g-list">${DIET_TIPS[g].map(t => `<li>${esc(t)}</li>`).join('')}</ul>
+        <small class="muted">O objetivo vem do seu perfil (aba Corpo). Para um cardápio sob medida, procure um nutricionista.</small></div>
+      ${myDiet && myDiet.length ? `<div><div class="lbl">Seu plano alimentar</div><div class="kv">${myDiet.map(([m, t]) => `<div><small>${esc(m)}</small><b style="font-weight:600">${esc(t)}</b></div>`).join('')}</div></div>` : ''}
+      <div><div class="card-top"><div class="lbl" style="margin:0">Minhas anotações</div>${dietEdit ? '' : `<button class="btn ghost" data-act="dietedit" style="padding:4px 8px">${notes ? 'Editar' : '+ Escrever'}</button>`}</div>
+        ${dietEdit ? `<textarea id="diet-notes" class="diet-ta" placeholder="Ex.: café da manhã com 3 ovos; evitar doce durante a semana; whey depois do treino">${esc(notes)}</textarea>
+          <div class="row"><button class="btn" data-act="dietcancel" style="flex:1">Cancelar</button><button class="btn primary" data-act="dietsave" style="flex:1">Salvar</button></div>`
+        : notes ? `<p class="notes diet-notes">${esc(notes)}</p>` : '<p class="muted" style="margin:0;font-size:.86rem">Anote aqui o que o nutricionista passou, receitas ou lembretes.</p>'}</div>
+    </div>`;
+}
+function renderHealth(){
+  $('#app').innerHTML = `${topbar()}${waterCard(false)}${dietCard()}
+    <div class="foot"><small>${mode === 'db' ? 'A água e as anotações ficam salvas na sua conta.' : 'Salvo só neste aparelho.'}</small></div>`;
+}
+function todayCard(){
+  const d = todayDay();
+  if (!plan || !plan.days || !plan.days.length) return `<div class="card today-mini"><div><span class="eyebrow">Treino</span><b>Nenhum plano ainda</b></div><button class="btn primary" data-act="templates">Escolher</button></div>`;
+  if (!d) return `<div class="card today-mini" style="--pc:#5b616e"><div><span class="eyebrow">Hoje</span><b>Dia de descanso</b><small>Recupere bem. O próximo treino aparece na aba Treino.</small></div></div>`;
+  const done = d.exercises.filter(isDone).length, n = d.exercises.length;
+  return `<div class="card today-mini" style="${pcOf(d)}"><span class="tm-badge">${esc(badgeOf(d))}</span>
+    <div style="min-width:0"><span class="eyebrow">Treino de hoje</span><b>${esc(d.label)}${d.focus ? ' · ' + esc(d.focus) : ''}</b><small>${done ? done + ' de ' + n + ' exercícios feitos' : n + ' exercícios · ~' + estMin(d) + ' min'}</small></div>
+    <button class="btn primary" data-act="tab" data-v="today">${done >= n && n ? 'Ver' : done ? 'Continuar' : 'Começar'}</button></div>`;
+}
+
 /* ---------- progresso do treino ---------- */
 let trainLog = {}, progEx = null, calMonth = null, calSel = null;
 const keyOf = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
@@ -1455,7 +1631,7 @@ function renderProg(){
   const goal = weekGoal(), streak = streakWeeks(), series = exerciseSeries(), vol = volumeSeries();
   const past = weeks.slice(0, -1), avg = past.reduce((s,w) => s + w.count, 0) / Math.max(1, past.length);
   const hero = `<section class="hero prog-hero" style="--pc:var(--accent)">
-    <div class="prog-top"><div style="min-width:0"><span class="eyebrow">Progresso · esta semana</span>
+    <div class="prog-top"><div style="min-width:0"><span class="eyebrow">Início · esta semana</span>
       <h1>${thisWeek >= goal ? 'Meta batida!' : thisWeek ? 'Em ritmo' : 'Bora começar'}</h1>
       <p class="focus" style="margin:0">${thisWeek >= goal ? 'Você fez todos os treinos da semana.' : `Faltam ${goal - thisWeek} treino${goal - thisWeek === 1 ? '' : 's'} para a meta de ${goal}.`}</p></div>
       <div class="ring">${weekRing(thisWeek, goal)}</div></div>
@@ -1466,7 +1642,7 @@ function renderProg(){
       <div><b>${fmt(avg)}</b><small>média por semana</small></div>
     </div></section>`;
   if (!dates.length){
-    app.innerHTML = `${topbar()}${hero}${calendarCard()}<div class="empty"><h2>Seus gráficos aparecem aqui</h2>
+    app.innerHTML = `${topbar()}${hero}<div class="home-quick">${todayCard()}${waterCard(true)}</div>${calendarCard()}<div class="empty"><h2>Seus gráficos aparecem aqui</h2>
       <p class="muted">Marque as séries na tela de treino e anote a carga de cada exercício. A partir do primeiro treino o app monta a frequência, o calendário, a evolução de carga e o volume.</p>
       <div><button class="btn primary" data-act="tab" data-v="today">Ir para o treino</button></div></div>`;
     return;
@@ -1489,6 +1665,7 @@ function renderProg(){
   const volCard = vol.length ? `<div class="card"><h2>Volume por treino</h2><p class="muted" style="margin:0;font-size:.86rem">Séries × repetições × carga somados em cada dia. Linha subindo = mais trabalho total.</p>
       <div class="chart" id="chart-vol">${lineChart('chart-vol', vol, 'kg', 'Volume por treino', 0)}</div></div>` : '';
   app.innerHTML = `${topbar()}${hero}
+    <div class="home-quick">${todayCard()}${waterCard(true)}</div>
     ${calendarCard()}
     <div class="card"><div class="card-top"><h2>Treinos por semana</h2><span class="pill">últimas 12</span></div><div class="chart">${barsSVG(weeks, goal)}</div>
       <p class="muted" style="margin:0;font-size:.82rem">A linha verde é a sua meta: ${goal} treinos por semana, conforme o seu plano.</p></div>
@@ -1590,7 +1767,7 @@ function metaPreview(d){
 function commitProfile(){
   const p = {sex: SEX[pdraft.sex] ? pdraft.sex : '', birth: /^\d{4}-\d{2}-\d{2}$/.test(pdraft.birth || '') ? pdraft.birth : '',
     height: num(pdraft.height), target: num(pdraft.target), targetMin: num(pdraft.targetMin), age: num(pdraft.age),
-    goal: pdraft.goal || '', activity: pdraft.activity || '', work: pdraft.work || ''};
+    goal: pdraft.goal || '', activity: pdraft.activity || '', work: pdraft.work || '', waterCup: pdraft.waterCup || null, dietNotes: pdraft.dietNotes || ''};
   const r = metaRange(pdraft.targetMin, pdraft.target); p.target = r.max; p.targetMin = r.min;
   if (p.height != null && p.height < 3) p.height = Math.round(p.height * 100); // digitou em metros
   profile = p; save('profile/me', profile); pdraft = null; view = 'body'; render(); window.scrollTo(0,0); toast('Perfil salvo');
@@ -1813,7 +1990,7 @@ function renderAccount(){
   el.hidden = false;
 }
 function backupData(){
-  return {app:'treino-do-dia', version:1, exportedAt:new Date().toISOString(), plan, profile, measures, logs:trainLog};
+  return {app:'treino-do-dia', version:1, exportedAt:new Date().toISOString(), plan, profile, measures, logs:trainLog, water:waterLog};
 }
 function downloadBackup(){
   try {
@@ -1827,7 +2004,7 @@ async function applyBackup(obj){
   if (!obj || obj.app !== 'treino-do-dia' || !(obj.plan || obj.measures || obj.profile)){ toast('Esse arquivo não é um backup do Treino do Dia.'); return; }
   plan = obj.plan || null; profile = obj.profile || null;
   measures = (obj.measures || []).filter(m => m && m.id && m.date); sortM();
-  trainLog = obj.logs || {}; log = trainLog[logKey] || {sets:{}}; if (!log.sets) log.sets = {};
+  trainLog = obj.logs || {}; waterLog = obj.water || {}; local.set('water', waterLog); log = trainLog[logKey] || {sets:{}}; if (!log.sets) log.sets = {};
   local.set('plan/current', plan); local.set('profile/me', profile); local.set('measures', measures); local.set('history', trainLog);
   if (mode === 'db'){
     toast('Restaurando…');
@@ -1836,6 +2013,7 @@ async function applyBackup(obj){
     if (profile) writes.push(db.doc('profile/me').set(clone(profile)));
     for (const m of measures){ const b = clone(m); delete b.id; writes.push(db.collection('measures').doc(m.id).set(b)); }
     for (const [k, v] of Object.entries(trainLog)) if (/^\d{4}-\d{2}-\d{2}$/.test(k)) writes.push(db.doc('logs/' + k).set(clone(v)));
+    for (const [k, v] of Object.entries(waterLog)) if (/^\d{4}-\d{2}-\d{2}$/.test(k)) writes.push(db.doc('water/' + k).set(clone(v)));
     try { await Promise.race([Promise.all(writes), new Promise(r => setTimeout(r, 6000))]); }
     catch(e){ toast('Parte do backup não foi salva na conta. Tente de novo com internet.'); return; }
   }
@@ -1849,7 +2027,7 @@ document.addEventListener('click', ev => {
   const a = b.dataset.act, id = b.dataset.id, di = +b.dataset.d, ei = +b.dataset.e;
   if (a === 'tab'){
     closeSheet(); view = b.dataset.v; viewDayId = null;
-    try { location.hash = view === 'body' ? 'corpo' : view === 'prog' ? 'progresso' : 'treino'; } catch(e){}
+    try { location.hash = view === 'body' ? 'corpo' : view === 'prog' ? 'inicio' : view === 'health' ? 'saude' : 'treino'; } catch(e){}
     render(); window.scrollTo(0,0); return;
   }
   if (a === 'play'){ if (openPlayer(b.dataset.url, b.dataset.label)) ev.preventDefault(); return; }
@@ -1857,6 +2035,16 @@ document.addEventListener('click', ev => {
   if (a === 'mute' || a === 'mute-set'){ toggleMute(); return; }
   if (a === 'calprev' || a === 'calnext'){ calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() + (a === 'calnext' ? 1 : -1), 1, 12); calSel = null; render(); return; }
   if (a === 'calday'){ calSel = b.dataset.k; const y = window.scrollY; render(); window.scrollTo(0, y); return; }
+  if (a === 'drink'){ drink(cupSize()); render(); return; }
+  if (a === 'undodrink'){ undoDrink(); render(); return; }
+  if (a === 'cup' || a === 'cupcustom'){
+    const ml = a === 'cup' ? +b.dataset.ml : parseInt((($('#cup-custom') || {}).value || '').replace(/\D/g, ''));
+    if (!(ml >= 50 && ml <= 2000)){ toast('Digite um tamanho entre 50 e 2000 ml.'); return; }
+    profile = Object.assign({}, profile || {}, {waterCup: ml}); save('profile/me', profile); render(); toast('Copo de ' + ml + ' ml'); return;
+  }
+  if (a === 'dietedit'){ dietEdit = true; render(); const t = $('#diet-notes'); if (t) t.focus(); return; }
+  if (a === 'dietcancel'){ dietEdit = false; render(); return; }
+  if (a === 'dietsave'){ const v = (($('#diet-notes') || {}).value || '').trim(); profile = Object.assign({}, profile || {}, {dietNotes: v}); save('profile/me', profile); dietEdit = false; render(); toast('Anotações salvas'); return; }
   if (a === 'login'){ doLogin(); return; }
   if (a === 'lgmode'){ loginMode = b.dataset.m; loginErr = ''; if (loginMode !== 'reset') loginMsg = ''; render(); const f = $('#lg-' + (loginMode === 'up' ? 'name' : 'email')); if (f) f.focus(); return; }
   if (a === 'install'){ doInstall(); return; }
